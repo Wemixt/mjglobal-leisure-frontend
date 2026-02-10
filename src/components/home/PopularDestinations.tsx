@@ -62,7 +62,7 @@ export default function PopularDestinations() {
   const getCardPosition = (index: number) => {
     const totalCards = destinations.length;
     const relativeIndex = (index - currentIndex + totalCards) % totalCards;
-    
+
     // Calculate position relative to center
     let position = relativeIndex;
     if (position > totalCards / 2) {
@@ -74,7 +74,7 @@ export default function PopularDestinations() {
 
   const getCardStyle = (position: number) => {
     const absPosition = Math.abs(position);
-    
+
     if (position === 0) {
       // Central card - in focus
       return {
@@ -131,11 +131,11 @@ export default function PopularDestinations() {
     <section className="relative w-full py-20 md:py-32 bg-[#FAF9F6] overflow-hidden z-10">
       <div className="container mx-auto px-6">
         {/* Header Section */}
-        <div className="text-center mb-16 space-y-4">
+        <div className="text-center mb-16 space-y-1">
           <p className="text-brand-orange text-lg md:text-xl italic tracking-wide" style={{ fontFamily: 'cursive' }}>
             Top Destination
           </p>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-black tracking-tight">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-black tracking-tight">
             Popular Destination
           </h2>
         </div>
@@ -144,79 +144,79 @@ export default function PopularDestinations() {
       {/* Carousel Container - Full width for proper centering */}
       <div className="relative h-[420px] md:h-[520px] w-full flex items-center justify-center overflow-hidden">
         <div className="relative w-full h-full max-w-full" style={{ isolation: 'isolate', contain: 'layout style paint' }}>
-            {destinations.map((destination, index) => {
-              const position = getCardPosition(index);
-              const style = getCardStyle(position);
-              const isActive = position === 0;
-              const cardWidth = isMobile ? 300 : 400;
-              const cardHeight = isMobile ? 420 : 520;
+          {destinations.map((destination, index) => {
+            const position = getCardPosition(index);
+            const style = getCardStyle(position);
+            const isActive = position === 0;
+            const cardWidth = isMobile ? 300 : 400;
+            const cardHeight = isMobile ? 420 : 520;
 
-              return (
-                <div
-                  key={destination.id}
-                  className={cn(
-                    "absolute cursor-pointer transition-all duration-700 ease-out",
-                    !isActive && "pointer-events-none"
-                  )}
-                  style={{
-                    width: `${cardWidth}px`,
-                    height: `${cardHeight}px`,
-                    left: "50%",
-                    top: "50%",
-                    marginLeft: `-${cardWidth / 2}px`,
-                    marginTop: `-${cardHeight / 2}px`,
-                    transform: `translateX(${style.translateX}px) scale(${style.scale})`,
-                    transformOrigin: "center center",
-                    zIndex: style.zIndex,
-                    opacity: style.opacity,
-                    filter: style.filter,
-                    willChange: 'transform',
-                  }}
-                  onClick={() => handleCardClick(index)}
-                >
-                  <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl">
-                    {/* Image */}
-                    <Image
-                      src={destination.image}
-                      alt={destination.name}
-                      fill
-                      className="object-cover"
-                      priority={isActive}
-                    />
-                    
-                    {/* Dark Overlay at Bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black/80 via-black/60 to-transparent" />
-                    
-                    {/* Content */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
-                      <div className="space-y-1 md:space-y-2">
-                        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
-                          {destination.name}
-                        </h3>
-                        <p className="text-white/90 text-xs md:text-sm lg:text-base">
-                          {destination.listingCount}
-                        </p>
-                      </div>
-                      
-                      <button
-                        className={cn(
-                          "flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-xl border-2 border-white text-white text-sm md:text-base font-semibold transition-all whitespace-nowrap",
-                          "hover:bg-white hover:text-brand-blue",
-                          !isActive && "opacity-50"
-                        )}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Handle view all action
-                        }}
-                      >
-                        View All
-                        <ArrowRight size={16} className="md:w-[18px] md:h-[18px]" />
-                      </button>
+            return (
+              <div
+                key={destination.id}
+                className={cn(
+                  "absolute cursor-pointer transition-all duration-700 ease-out",
+                  !isActive && "pointer-events-none"
+                )}
+                style={{
+                  width: `${cardWidth}px`,
+                  height: `${cardHeight}px`,
+                  left: "50%",
+                  top: "50%",
+                  marginLeft: `-${cardWidth / 2}px`,
+                  marginTop: `-${cardHeight / 2}px`,
+                  transform: `translateX(${style.translateX}px) scale(${style.scale})`,
+                  transformOrigin: "center center",
+                  zIndex: style.zIndex,
+                  opacity: style.opacity,
+                  filter: style.filter,
+                  willChange: 'transform',
+                }}
+                onClick={() => handleCardClick(index)}
+              >
+                <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl">
+                  {/* Image */}
+                  <Image
+                    src={destination.image}
+                    alt={destination.name}
+                    fill
+                    className="object-cover"
+                    priority={isActive}
+                  />
+
+                  {/* Dark Overlay at Bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black/80 via-black/60 to-transparent" />
+
+                  {/* Content */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+                    <div className="space-y-1 md:space-y-2">
+                      <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
+                        {destination.name}
+                      </h3>
+                      <p className="text-white/90 text-xs md:text-sm lg:text-base">
+                        {destination.listingCount}
+                      </p>
                     </div>
+
+                    <button
+                      className={cn(
+                        "flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-xl border-2 border-white text-white text-sm md:text-base font-semibold transition-all whitespace-nowrap",
+                        "hover:bg-white hover:text-brand-blue",
+                        !isActive && "opacity-50"
+                      )}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Handle view all action
+                      }}
+                    >
+                      View All
+                      <ArrowRight size={16} className="md:w-[18px] md:h-[18px]" />
+                    </button>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            );
+          })}
         </div>
       </div>
 
