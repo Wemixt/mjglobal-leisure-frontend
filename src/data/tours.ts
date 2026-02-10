@@ -1,0 +1,3 @@
+import { Tour } from "../types";
+
+export const tours: Tour[] = [];
