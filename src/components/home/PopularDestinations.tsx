@@ -128,7 +128,7 @@ export default function PopularDestinations() {
   };
 
   return (
-    <section className="relative w-full py-20 md:py-32 bg-[#FAF9F6] overflow-hidden z-10">
+    <section className="relative w-full py-16 md:py-24 lg:py-32 bg-[#FAF9F6] overflow-hidden z-10">
       <div className="container mx-auto px-6">
         {/* Header Section */}
         <div className="text-center mb-16 space-y-1">

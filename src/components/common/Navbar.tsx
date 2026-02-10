@@ -66,8 +66,8 @@ export default function Navbar() {
                         className={cn(
                             "rounded-full px-6 py-2 text-sm font-bold transition-all hover:scale-105",
                             isScrolled
-                                ? "bg-brand-blue text-white"
-                                : "bg-white text-brand-blue"
+                                ? "bg-brand-orange text-white"
+                                : "bg-white text-brand-orange"
                         )}
                     >
                         Book Now
@@ -112,7 +112,7 @@ export default function Navbar() {
                     ))}
                     <Link
                         href="/contact"
-                        className="mt-4 rounded-full bg-brand-blue py-3 text-center text-lg font-bold text-white shadow-lg"
+                        className="mt-4 rounded-full bg-brand-orange py-3 text-center text-lg font-bold text-white shadow-lg"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
                         Book Now
