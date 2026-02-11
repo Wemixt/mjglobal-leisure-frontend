@@ -61,11 +61,11 @@ export default async function DestinationDetailsPage({ params }: DestinationDeta
                                     )}
                                 </div>
                                 
-                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight">
                                     {destination.name}
                                 </h1>
                                 
-                                <p className="text-white/90 text-lg md:text-xl max-w-2xl">
+                                <p className="text-white/90 text-base md:text-lg max-w-2xl">
                                     {destination.shortDescription}
                                 </p>
                             </div>
