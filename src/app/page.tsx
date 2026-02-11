@@ -7,6 +7,7 @@ import PopularActivities from "@/components/home/PopularActivities";
 import StatisticsCounter from "@/components/home/StatisticsCounter";
 import RecentGallery from "@/components/home/RecentGallery";
 import Testimonials from "@/components/home/Testimonials";
+import Newsletter from "@/components/home/Newsletter";
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
         <StatisticsCounter />
         <RecentGallery />
         <Testimonials />
+        <Newsletter />
         {/* Other sections like Tours, etc. would go here */}
       </main>
       <Footer />

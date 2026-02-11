@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export default function GetToKnowUs() {
   return (
-    <section className="relative w-full py-16 md:py-24 lg:py-32 bg-[#FAF9F6]">
+    <section className="relative w-full py-8 lg:py-10 bg-[#FAF9F6]">
       <div className="container mx-auto px-8 md:px-12 lg:px-16 xl:px-20">
         <div className="w-full lg:w-[98%] xl:w-[97%] ml-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-20 items-center">
