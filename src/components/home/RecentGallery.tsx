@@ -75,10 +75,10 @@ export default function RecentGallery() {
       <div className="container mx-auto px-6 md:px-12 lg:px-16 xl:px-20">
         {/* Header */}
         <div className="text-center mb-12 md:mb-16 space-y-2">
-          <p className="text-brand-orange text-sm md:text-lg italic tracking-wide" style={{ fontFamily: 'cursive' }}>
+          <p className="text-brand-orange text-sm md:text-base lg:text-lg italic tracking-wide" style={{ fontFamily: 'cursive' }}>
             Make Your Tour More Pleasure
           </p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black tracking-tight">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-black tracking-tight">
             Recent Gallery
           </h2>
         </div>

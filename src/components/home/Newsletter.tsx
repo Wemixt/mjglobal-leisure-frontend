@@ -42,11 +42,11 @@ export default function Newsletter() {
                 <Mail className="w-6 h-6 md:w-7 md:h-7 text-brand-orange" />
               </div>
               
-              <p className="text-brand-orange text-xs md:text-sm italic tracking-wide" style={{ fontFamily: 'cursive' }}>
+              <p className="text-brand-orange text-sm md:text-base lg:text-lg italic tracking-wide" style={{ fontFamily: 'cursive' }}>
                 Stay Connected
               </p>
               
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-black tracking-tight">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-black tracking-tight">
                 Subscribe to Our Newsletter
               </h2>
               

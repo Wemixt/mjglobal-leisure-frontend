@@ -102,44 +102,30 @@ export default function ContactPage() {
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-            <p
-              className="text-white/90 text-lg md:text-xl italic tracking-wide mb-2"
-              style={{ fontFamily: "cursive" }}
-            >
-              Get in Touch
-            </p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white tracking-tight drop-shadow-lg">
-              Contact Us
-            </h1>
-            <p className="text-white/90 text-base md:text-lg mt-4 max-w-2xl">
-              Have a question or ready to plan your Sri Lankan adventure? We’d love to hear from you.
-            </p>
-          </div>
         </section>
 
         {/* Contact Details Cards */}
-        <section className="relative -mt-16 md:-mt-20 z-20 px-4 md:px-6">
+        <section className="relative -mt-16 md:-mt-20 z-20 px-4 sm:px-6 md:px-6">
           <div className="container mx-auto max-w-6xl">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
               <a
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(siteConfig.contact.address)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={cn(
-                  "group flex flex-col md:flex-row md:items-center gap-4 p-6 md:p-8 rounded-2xl bg-white shadow-xl border border-gray-100",
-                  "transition-all duration-300 hover:shadow-2xl hover:border-brand-orange/20 hover:-translate-y-1"
+                  "group flex flex-col md:flex-row md:items-center gap-2 sm:gap-3 p-3 sm:p-4 md:p-5 rounded-lg bg-white shadow-md border border-gray-100",
+                  "transition-all duration-300 hover:shadow-lg hover:border-brand-orange/20 hover:-translate-y-0.5"
                 )}
               >
-                <div className="flex-shrink-0 w-14 h-14 rounded-full bg-brand-orange/10 flex items-center justify-center group-hover:bg-brand-orange/20 transition-colors">
-                  <MapPin className="w-7 h-7 text-brand-orange" />
+                <div className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand-orange/10 flex items-center justify-center group-hover:bg-brand-orange/20 transition-colors">
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-brand-orange" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-1">Address</h3>
-                  <p className="text-gray-900 font-semibold text-base md:text-lg leading-snug">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-0.5">Address</h3>
+                  <p className="text-gray-900 font-semibold text-sm leading-tight">
                     {siteConfig.contact.address}
                   </p>
-                  <p className="text-brand-orange text-sm font-medium mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <p className="text-brand-orange text-xs font-medium mt-1">
                     Open in Maps →
                   </p>
                 </div>
@@ -148,19 +134,19 @@ export default function ContactPage() {
               <a
                 href={`mailto:${siteConfig.contact.email}`}
                 className={cn(
-                  "group flex flex-col md:flex-row md:items-center gap-4 p-6 md:p-8 rounded-2xl bg-white shadow-xl border border-gray-100",
-                  "transition-all duration-300 hover:shadow-2xl hover:border-brand-orange/20 hover:-translate-y-1"
+                  "group flex flex-col md:flex-row md:items-center gap-2 sm:gap-3 p-3 sm:p-4 md:p-5 rounded-lg bg-white shadow-md border border-gray-100",
+                  "transition-all duration-300 hover:shadow-lg hover:border-brand-orange/20 hover:-translate-y-0.5"
                 )}
               >
-                <div className="flex-shrink-0 w-14 h-14 rounded-full bg-brand-orange/10 flex items-center justify-center group-hover:bg-brand-orange/20 transition-colors">
-                  <Mail className="w-7 h-7 text-brand-orange" />
+                <div className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand-orange/10 flex items-center justify-center group-hover:bg-brand-orange/20 transition-colors">
+                  <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-brand-orange" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-1">Email</h3>
-                  <p className="text-gray-900 font-semibold text-base md:text-lg break-all">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-0.5">Email</h3>
+                  <p className="text-gray-900 font-semibold text-sm break-all leading-tight">
                     {siteConfig.contact.email}
                   </p>
-                  <p className="text-brand-orange text-sm font-medium mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <p className="text-brand-orange text-xs font-medium mt-1">
                     Send an email →
                   </p>
                 </div>
@@ -169,19 +155,19 @@ export default function ContactPage() {
               <a
                 href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
                 className={cn(
-                  "group flex flex-col md:flex-row md:items-center gap-4 p-6 md:p-8 rounded-2xl bg-white shadow-xl border border-gray-100",
-                  "transition-all duration-300 hover:shadow-2xl hover:border-brand-orange/20 hover:-translate-y-1"
+                  "group flex flex-col md:flex-row md:items-center gap-2 sm:gap-3 p-3 sm:p-4 md:p-5 rounded-lg bg-white shadow-md border border-gray-100",
+                  "transition-all duration-300 hover:shadow-lg hover:border-brand-orange/20 hover:-translate-y-0.5"
                 )}
               >
-                <div className="flex-shrink-0 w-14 h-14 rounded-full bg-brand-orange/10 flex items-center justify-center group-hover:bg-brand-orange/20 transition-colors">
-                  <Phone className="w-7 h-7 text-brand-orange" />
+                <div className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand-orange/10 flex items-center justify-center group-hover:bg-brand-orange/20 transition-colors">
+                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-brand-orange" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-1">Phone</h3>
-                  <p className="text-gray-900 font-semibold text-base md:text-lg">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-0.5">Phone</h3>
+                  <p className="text-gray-900 font-semibold text-sm leading-tight">
                     {siteConfig.contact.phone}
                   </p>
-                  <p className="text-brand-orange text-sm font-medium mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <p className="text-brand-orange text-xs font-medium mt-1">
                     Call us →
                   </p>
                 </div>
@@ -192,48 +178,48 @@ export default function ContactPage() {
             <div className="mt-6 md:mt-8 rounded-2xl border-2 border-brand-orange/20 bg-gradient-to-r from-brand-orange/5 via-white to-brand-orange/5 shadow-xl shadow-gray-200/50 overflow-hidden">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8 p-6 md:p-8">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-brand-orange/15 flex items-center justify-center shadow-inner ring-2 ring-brand-orange/20">
-                    <Clock className="w-7 h-7 text-brand-orange" />
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-brand-orange/15 flex items-center justify-center shadow-inner ring-2 ring-brand-orange/20">
+                    <Clock className="w-6 h-6 sm:w-7 sm:h-7 text-brand-orange" />
                   </div>
                   <div>
                     <p className="text-xs font-bold uppercase tracking-wider text-brand-orange/90">Office Hours</p>
-                    <p className="text-gray-900 font-bold text-base md:text-lg mt-0.5">Mon – Sat: 9:00 AM – 6:00 PM</p>
+                    <p className="text-gray-900 font-bold text-sm sm:text-base md:text-lg mt-0.5">Mon – Sat: 9:00 AM – 6:00 PM</p>
                     <p className="text-gray-500 text-sm mt-1">We’re here to help plan your trip.</p>
                   </div>
                 </div>
                 <div className="hidden sm:block w-px h-12 bg-gray-200" aria-hidden />
-                <div className="flex flex-col sm:flex-row items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
                   <div className="text-center sm:text-left">
                     <p className="text-xs font-bold uppercase tracking-wider text-brand-orange/90">Follow us</p>
-                    <p className="text-gray-600 text-sm mt-0.5">Stay updated with offers & travel tips</p>
+                    <p className="text-gray-600 text-xs sm:text-sm mt-0.5">Stay updated with offers & travel tips</p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <a
                       href={siteConfig.social.facebook}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-11 h-11 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange border border-brand-orange/20 hover:bg-brand-orange hover:text-white hover:border-brand-orange hover:scale-110 transition-all shadow-sm"
+                      className="w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange border border-brand-orange/20 hover:bg-brand-orange hover:text-white hover:border-brand-orange hover:scale-110 transition-all shadow-sm"
                       aria-label="Facebook"
                     >
-                      <Facebook size={20} />
+                      <Facebook className="w-4 h-4 sm:w-5 sm:h-5 md:w-5 md:h-5" />
                     </a>
                     <a
                       href={siteConfig.social.instagram}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-11 h-11 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange border border-brand-orange/20 hover:bg-brand-orange hover:text-white hover:border-brand-orange hover:scale-110 transition-all shadow-sm"
+                      className="w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange border border-brand-orange/20 hover:bg-brand-orange hover:text-white hover:border-brand-orange hover:scale-110 transition-all shadow-sm"
                       aria-label="Instagram"
                     >
-                      <Instagram size={20} />
+                      <Instagram className="w-4 h-4 sm:w-5 sm:h-5 md:w-5 md:h-5" />
                     </a>
                     <a
                       href={siteConfig.social.twitter}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-11 h-11 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange border border-brand-orange/20 hover:bg-brand-orange hover:text-white hover:border-brand-orange hover:scale-110 transition-all shadow-sm"
+                      className="w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange border border-brand-orange/20 hover:bg-brand-orange hover:text-white hover:border-brand-orange hover:scale-110 transition-all shadow-sm"
                       aria-label="Twitter"
                     >
-                      <Twitter size={20} />
+                      <Twitter className="w-4 h-4 sm:w-5 sm:h-5 md:w-5 md:h-5" />
                     </a>
                   </div>
                 </div>
@@ -243,31 +229,31 @@ export default function ContactPage() {
         </section>
 
         {/* Contact Form Section */}
-        <section className="py-16 md:py-20 lg:py-24 bg-[#FAF9F6]">
-          <div className="container mx-auto px-6 md:px-10 max-w-4xl">
-            <div className="text-center mb-10 md:mb-12 space-y-2">
+        <section className="py-12 md:py-20 lg:py-24 bg-[#FAF9F6]">
+          <div className="container mx-auto px-4 sm:px-6 md:px-10 max-w-4xl">
+            <div className="text-center mb-8 md:mb-12 space-y-2">
               <p
                 className="text-brand-orange text-lg md:text-xl italic tracking-wide"
                 style={{ fontFamily: "cursive" }}
               >
                 Send a Message
               </p>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-black tracking-tight">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-black tracking-tight">
                 We’ll Get Back to You Soon
               </h2>
-              <p className="text-gray-600 text-base md:text-lg max-w-2xl mx-auto">
+              <p className="text-gray-600 text-sm md:text-base lg:text-lg max-w-2xl mx-auto">
                 Fill in the form below and our team will respond within 24 hours.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl border border-gray-100 p-6 md:p-8 lg:p-10">
+            <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl border border-gray-100 p-5 sm:p-6 md:p-8 lg:p-10">
               {submitStatus === "success" ? (
-                <div className="text-center py-12 px-4">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
-                    <CheckCircle2 className="w-10 h-10 text-green-600" />
+                <div className="text-center py-10 sm:py-12 px-4">
+                  <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-green-100 mb-4">
+                    <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" />
                   </div>
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Message Sent Successfully</h3>
-                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-2">Message Sent Successfully</h3>
+                  <p className="text-gray-600 text-sm md:text-base mb-6 max-w-md mx-auto">
                     Thank you for reaching out. We’ll get back to you within 24 hours.
                   </p>
                   <button
@@ -409,23 +395,23 @@ export default function ContactPage() {
                       type="submit"
                       disabled={isSubmitting}
                       className={cn(
-                        "w-full md:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl",
-                        "bg-brand-orange text-white font-bold text-base md:text-lg",
+                        "w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-8 sm:py-4 rounded-xl",
+                        "bg-brand-orange text-white font-bold text-sm sm:text-base md:text-lg",
                         "shadow-lg shadow-brand-orange/30 transition-all",
                         "hover:bg-brand-orange/90 hover:scale-[1.02] hover:shadow-xl",
                         "disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100",
-                        "min-h-[52px]"
+                        "min-h-[48px] sm:min-h-[52px]"
                       )}
                     >
                       {isSubmitting ? (
                         <>
-                          <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Sending...
+                          <span className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>Sending...</span>
                         </>
                       ) : (
                         <>
                           Send Message
-                          <Send className="w-5 h-5" />
+                          <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                         </>
                       )}
                     </button>
