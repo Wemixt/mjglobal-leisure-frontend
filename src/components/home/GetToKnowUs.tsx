@@ -40,11 +40,11 @@ export default function GetToKnowUs() {
           {/* Right Column - Content */}
           <div className="space-y-3 md:space-y-4">
             {/* Header Section */}
-            <div className="space-y-1.5 md:space-y-2">
-              <p className="text-brand-orange text-sm md:text-lg italic tracking-wide" style={{ fontFamily: 'cursive' }}>
+            <div className="space-y-2">
+              <p className="text-brand-orange text-sm md:text-base lg:text-lg italic tracking-wide" style={{ fontFamily: 'cursive' }}>
                 Get to know us
               </p>
-              <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-4xl font-bold text-black tracking-tight leading-tight">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-black tracking-tight leading-tight">
                 Plan Your Trip with Us
               </h2>
             </div>

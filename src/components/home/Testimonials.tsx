@@ -192,10 +192,10 @@ export default function Testimonials() {
       <div className="container mx-auto px-6 md:px-12 lg:px-16 xl:px-20 relative z-10">
         {/* Header Section */}
         <div className="text-center mb-12 md:mb-16 space-y-2">
-          <p className="text-brand-orange text-sm md:text-lg italic tracking-wide" style={{ fontFamily: 'cursive' }}>
+          <p className="text-brand-orange text-sm md:text-base lg:text-lg italic tracking-wide" style={{ fontFamily: 'cursive' }}>
             What Our Clients Say
           </p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-black tracking-tight">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-black tracking-tight">
             Testimonials
           </h2>
           <p className="text-gray-500 text-sm md:text-base max-w-2xl mx-auto mt-4">

@@ -131,11 +131,11 @@ export default function PopularDestinations() {
     <section className="relative w-full py-16 md:py-24 lg:py-32 bg-[#FAF9F6] overflow-hidden z-10">
       <div className="container mx-auto px-6">
         {/* Header Section */}
-        <div className="text-center mb-16 space-y-1">
-          <p className="text-brand-orange text-lg md:text-xl italic tracking-wide" style={{ fontFamily: 'cursive' }}>
+        <div className="text-center mb-12 md:mb-16 space-y-2">
+          <p className="text-brand-orange text-sm md:text-base lg:text-lg italic tracking-wide" style={{ fontFamily: 'cursive' }}>
             Top Destination
           </p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium text-black tracking-tight">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-black tracking-tight">
             Popular Destination
           </h2>
         </div>
