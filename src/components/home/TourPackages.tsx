@@ -30,16 +30,16 @@ export default function TourPackages() {
                                 <Link
                                     href={`/tours/${tour.slug}`}
                                     className={cn(
-                                        "flex items-center justify-between gap-3 md:gap-4 px-4 md:px-6 py-4 md:py-5 lg:py-6",
-                                        "text-left transition-colors duration-200",
-                                        "hover:bg-white hover:shadow-sm",
+                                        "flex items-center justify-between gap-3 md:gap-4 px-4 md:px-6 py-3.5 md:py-4 lg:py-5",
+                                        "text-left transition-all duration-200",
+                                        "hover:bg-white hover:shadow-sm hover:border-brand-orange/20",
                                         "group"
                                     )}
                                 >
-                                    <span className="text-base md:text-lg lg:text-xl font-semibold text-gray-900 group-hover:text-gray-900 transition-colors">
+                                    <span className="text-sm md:text-base font-medium text-gray-700 group-hover:text-brand-orange transition-colors leading-relaxed">
                                         {tour.title}
                                     </span>
-                                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-brand-orange group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-brand-orange group-hover:translate-x-1 transition-all flex-shrink-0" />
                                 </Link>
                             </li>
                         ))}
@@ -50,7 +50,7 @@ export default function TourPackages() {
                 <div className="text-center mt-8 md:mt-10">
                     <Link
                         href="/tours"
-                        className="inline-flex items-center gap-2 text-brand-orange font-bold hover:gap-3 transition-all group text-sm md:text-base"
+                        className="inline-flex items-center gap-2 text-brand-orange font-semibold hover:gap-3 transition-all group text-sm md:text-base"
                     >
                         <span>View all tour packages</span>
                         <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
