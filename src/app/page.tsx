@@ -3,6 +3,7 @@ import Footer from "@/components/common/Footer";
 import Hero from "@/components/common/Hero";
 import PopularDestinations from "@/components/home/PopularDestinations";
 import TourPackages from "@/components/home/TourPackages";
+import BlogSection from "@/components/home/BlogSection";
 import GetToKnowUs from "@/components/home/GetToKnowUs";
 import PopularActivities from "@/components/home/PopularActivities";
 import StatisticsCounter from "@/components/home/StatisticsCounter";
@@ -18,6 +19,7 @@ export default function Home() {
         <Hero />
         <PopularDestinations />
         <TourPackages />
+        <BlogSection />
         <GetToKnowUs />
         <PopularActivities />
         <StatisticsCounter />
