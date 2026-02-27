@@ -7,11 +7,11 @@ import Link from "next/link";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import { getTourBySlug } from "@/data/tours";
-import { ArrowLeft, Clock, Calendar, Users, CheckCircle2, Send, MapPin } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, Users, User, Phone, Mail, Globe, MessageCircle, CheckCircle2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const countries = [
-    { value: "", label: "Select your country" },
+    { value: "", label: "-- Select country --" },
     { value: "US", label: "United States" },
     { value: "UK", label: "United Kingdom" },
     { value: "CA", label: "Canada" },
@@ -51,14 +51,14 @@ export default function BookingPage() {
     const tour = getTourBySlug(slug);
 
     const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        phone: "",
-        country: "",
-        passengers: "",
         arrivalDate: "",
-        departureDate: "",
-        specialRequests: "",
+        passengers: "",
+        title: "Mr.",
+        fullName: "",
+        phone: "",
+        email: "",
+        country: "",
+        message: "",
     });
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,14 +82,14 @@ export default function BookingPage() {
 
     const validate = () => {
         const errors: Record<string, string> = {};
-        if (!formData.name.trim()) errors.name = "Name is required";
+        if (!formData.arrivalDate) errors.arrivalDate = "Arrival date is required";
+        if (!formData.passengers) errors.passengers = "Total no of pax is required";
+        if (!formData.fullName.trim()) errors.fullName = "Full name is required";
+        if (!formData.phone.trim()) errors.phone = "Contact number is required";
         if (!formData.email.trim()) errors.email = "Email is required";
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Enter a valid email";
-        if (!formData.phone.trim()) errors.phone = "Phone number is required";
         if (!formData.country) errors.country = "Country is required";
-        if (!formData.passengers) errors.passengers = "Number of passengers is required";
-        else if (parseInt(formData.passengers) < 1) errors.passengers = "At least 1 passenger required";
-        if (!formData.arrivalDate) errors.arrivalDate = "Arrival date is required";
+        if (!formData.message.trim()) errors.message = "Message is required";
         return errors;
     };
 
@@ -99,12 +99,13 @@ export default function BookingPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setTouched({
-            name: true,
-            email: true,
-            phone: true,
-            country: true,
-            passengers: true,
             arrivalDate: true,
+            passengers: true,
+            fullName: true,
+            phone: true,
+            email: true,
+            country: true,
+            message: true,
         });
         if (!isValid) return;
 
@@ -116,14 +117,14 @@ export default function BookingPage() {
             await new Promise((resolve) => setTimeout(resolve, 1500));
             setSubmitStatus("success");
             setFormData({
-                name: "",
-                email: "",
-                phone: "",
-                country: "",
-                passengers: "",
                 arrivalDate: "",
-                departureDate: "",
-                specialRequests: "",
+                passengers: "",
+                title: "Mr.",
+                fullName: "",
+                phone: "",
+                email: "",
+                country: "",
+                message: "",
             });
             setTouched({});
         } catch {
@@ -268,57 +269,107 @@ export default function BookingPage() {
                                             <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                                                     <div className="space-y-2">
-                                                        <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
-                                                            Full Name <span className="text-brand-orange">*</span>
+                                                        <label htmlFor="arrivalDate" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Calendar className="w-4 h-4 text-gray-500" />
+                                                            Arrival Date <span className="text-brand-orange">*</span>
                                                         </label>
                                                         <input
-                                                            id="name"
-                                                            name="name"
-                                                            type="text"
-                                                            value={formData.name}
+                                                            id="arrivalDate"
+                                                            name="arrivalDate"
+                                                            type="date"
+                                                            value={formData.arrivalDate}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
-                                                            placeholder="John Doe"
+                                                            min={new Date().toISOString().split("T")[0]}
                                                             className={cn(
-                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900",
                                                                 "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
                                                                 "text-sm md:text-base",
-                                                                touched.name && errors.name ? "border-red-400" : "border-gray-200"
+                                                                touched.arrivalDate && errors.arrivalDate ? "border-red-400" : "border-gray-200"
                                                             )}
                                                         />
-                                                        {touched.name && errors.name && (
-                                                            <p className="text-sm text-red-500">{errors.name}</p>
+                                                        {touched.arrivalDate && errors.arrivalDate && (
+                                                            <p className="text-sm text-red-500">{errors.arrivalDate}</p>
                                                         )}
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
-                                                            Email <span className="text-brand-orange">*</span>
+                                                        <label htmlFor="passengers" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Users className="w-4 h-4 text-gray-500" />
+                                                            Total No Of Pax <span className="text-brand-orange">*</span>
                                                         </label>
-                                                        <input
-                                                            id="email"
-                                                            name="email"
-                                                            type="email"
-                                                            value={formData.email}
+                                                        <select
+                                                            id="passengers"
+                                                            name="passengers"
+                                                            value={formData.passengers}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
-                                                            placeholder="john@example.com"
                                                             className={cn(
-                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900",
                                                                 "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                                                                "text-sm md:text-base",
-                                                                touched.email && errors.email ? "border-red-400" : "border-gray-200"
+                                                                "text-sm md:text-base appearance-none cursor-pointer",
+                                                                touched.passengers && errors.passengers ? "border-red-400" : "border-gray-200"
                                                             )}
-                                                        />
-                                                        {touched.email && errors.email && (
-                                                            <p className="text-sm text-red-500">{errors.email}</p>
+                                                        >
+                                                            <option value="">--select--</option>
+                                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                                                                <option key={n} value={n}>{n}</option>
+                                                            ))}
+                                                        </select>
+                                                        {touched.passengers && errors.passengers && (
+                                                            <p className="text-sm text-red-500">{errors.passengers}</p>
                                                         )}
                                                     </div>
                                                 </div>
 
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                                                     <div className="space-y-2">
-                                                        <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">
-                                                            Phone Number <span className="text-brand-orange">*</span>
+                                                        <label htmlFor="fullName" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <User className="w-4 h-4 text-gray-500" />
+                                                            Enter Full Name <span className="text-brand-orange">*</span>
+                                                        </label>
+                                                        <div className="flex gap-2">
+                                                            <select
+                                                                name="title"
+                                                                value={formData.title}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                className={cn(
+                                                                    "w-20 flex-shrink-0 px-3 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900",
+                                                                    "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                                                                    "text-sm md:text-base appearance-none cursor-pointer",
+                                                                    "border-gray-200"
+                                                                )}
+                                                            >
+                                                                <option value="Mr.">Mr.</option>
+                                                                <option value="Mrs.">Mrs.</option>
+                                                                <option value="Ms.">Ms.</option>
+                                                                <option value="Miss">Miss</option>
+                                                                <option value="Dr.">Dr.</option>
+                                                            </select>
+                                                            <input
+                                                                id="fullName"
+                                                                name="fullName"
+                                                                type="text"
+                                                                value={formData.fullName}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                placeholder="Name"
+                                                                className={cn(
+                                                                    "flex-1 min-w-0 px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                                                                    "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                                                                    "text-sm md:text-base",
+                                                                    touched.fullName && errors.fullName ? "border-red-400" : "border-gray-200"
+                                                                )}
+                                                            />
+                                                        </div>
+                                                        {touched.fullName && errors.fullName && (
+                                                            <p className="text-sm text-red-500">{errors.fullName}</p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="phone" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Phone className="w-4 h-4 text-gray-500" />
+                                                            Your Contact No. <span className="text-brand-orange">*</span>
                                                         </label>
                                                         <input
                                                             id="phone"
@@ -327,7 +378,7 @@ export default function BookingPage() {
                                                             value={formData.phone}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
-                                                            placeholder="+94 77 123 4567"
+                                                            placeholder="+94771234567"
                                                             className={cn(
                                                                 "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
                                                                 "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
@@ -339,9 +390,37 @@ export default function BookingPage() {
                                                             <p className="text-sm text-red-500">{errors.phone}</p>
                                                         )}
                                                     </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                                                     <div className="space-y-2">
-                                                        <label htmlFor="country" className="block text-sm font-semibold text-gray-700">
-                                                            Country <span className="text-brand-orange">*</span>
+                                                        <label htmlFor="email" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Mail className="w-4 h-4 text-gray-500" />
+                                                            Your Email Address <span className="text-brand-orange">*</span>
+                                                        </label>
+                                                        <input
+                                                            id="email"
+                                                            name="email"
+                                                            type="email"
+                                                            value={formData.email}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            placeholder="Email Address"
+                                                            className={cn(
+                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                                                                "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                                                                "text-sm md:text-base",
+                                                                touched.email && errors.email ? "border-red-400" : "border-gray-200"
+                                                            )}
+                                                        />
+                                                        {touched.email && errors.email && (
+                                                            <p className="text-sm text-red-500">{errors.email}</p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="country" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Globe className="w-4 h-4 text-gray-500" />
+                                                            Your Country <span className="text-brand-orange">*</span>
                                                         </label>
                                                         <select
                                                             id="country"
@@ -368,95 +447,29 @@ export default function BookingPage() {
                                                     </div>
                                                 </div>
 
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                                                    <div className="space-y-2">
-                                                        <label htmlFor="passengers" className="block text-sm font-semibold text-gray-700">
-                                                            Number of Passengers <span className="text-brand-orange">*</span>
-                                                        </label>
-                                                        <input
-                                                            id="passengers"
-                                                            name="passengers"
-                                                            type="number"
-                                                            min="1"
-                                                            max="20"
-                                                            value={formData.passengers}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            placeholder="2"
-                                                            className={cn(
-                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
-                                                                "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                                                                "text-sm md:text-base",
-                                                                touched.passengers && errors.passengers ? "border-red-400" : "border-gray-200"
-                                                            )}
-                                                        />
-                                                        {touched.passengers && errors.passengers && (
-                                                            <p className="text-sm text-red-500">{errors.passengers}</p>
-                                                        )}
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label htmlFor="arrivalDate" className="block text-sm font-semibold text-gray-700">
-                                                            Arrival Date <span className="text-brand-orange">*</span>
-                                                        </label>
-                                                        <input
-                                                            id="arrivalDate"
-                                                            name="arrivalDate"
-                                                            type="date"
-                                                            value={formData.arrivalDate}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            min={new Date().toISOString().split('T')[0]}
-                                                            className={cn(
-                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900",
-                                                                "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                                                                "text-sm md:text-base",
-                                                                touched.arrivalDate && errors.arrivalDate ? "border-red-400" : "border-gray-200"
-                                                            )}
-                                                        />
-                                                        {touched.arrivalDate && errors.arrivalDate && (
-                                                            <p className="text-sm text-red-500">{errors.arrivalDate}</p>
-                                                        )}
-                                                    </div>
-                                                </div>
-
                                                 <div className="space-y-2">
-                                                    <label htmlFor="departureDate" className="block text-sm font-semibold text-gray-700">
-                                                        Departure Date (Optional)
-                                                    </label>
-                                                    <input
-                                                        id="departureDate"
-                                                        name="departureDate"
-                                                        type="date"
-                                                        value={formData.departureDate}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        min={formData.arrivalDate || new Date().toISOString().split('T')[0]}
-                                                        className={cn(
-                                                            "w-full px-4 py-3 md:py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-900",
-                                                            "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                                                            "text-sm md:text-base"
-                                                        )}
-                                                    />
-                                                </div>
-
-                                                <div className="space-y-2">
-                                                    <label htmlFor="specialRequests" className="block text-sm font-semibold text-gray-700">
-                                                        Special Requests or Notes
+                                                    <label htmlFor="message" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                        <MessageCircle className="w-4 h-4 text-gray-500" />
+                                                        Enter your message <span className="text-brand-orange">*</span>
                                                     </label>
                                                     <textarea
-                                                        id="specialRequests"
-                                                        name="specialRequests"
-                                                        value={formData.specialRequests}
+                                                        id="message"
+                                                        name="message"
+                                                        value={formData.message}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        placeholder="Any dietary requirements, accessibility needs, or special requests..."
+                                                        placeholder="Enter your message"
                                                         rows={4}
                                                         className={cn(
-                                                            "w-full px-4 py-3 md:py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 resize-y min-h-[100px]",
+                                                            "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400 resize-y min-h-[100px]",
                                                             "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                                                            "text-sm md:text-base"
+                                                            "text-sm md:text-base",
+                                                            touched.message && errors.message ? "border-red-400" : "border-gray-200"
                                                         )}
                                                     />
+                                                    {touched.message && errors.message && (
+                                                        <p className="text-sm text-red-500">{errors.message}</p>
+                                                    )}
                                                 </div>
 
                                                 {submitStatus === "error" && (

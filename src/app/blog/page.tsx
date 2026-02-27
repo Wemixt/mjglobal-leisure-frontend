@@ -49,7 +49,7 @@ export default function BlogPage() {
                 {/* Blog grid */}
                 <section className="py-8 md:py-12 lg:py-16 bg-[#FAF9F6]">
                     <div className="container mx-auto px-4 md:px-6 max-w-7xl">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 lg:gap-6">
                             {blogs.map((post) => (
                                 <Link
                                     key={post.id}
@@ -60,7 +60,7 @@ export default function BlogPage() {
                                 >
                                     <article
                                         className={cn(
-                                            "relative overflow-hidden rounded-2xl",
+                                            "relative overflow-hidden rounded-xl md:rounded-2xl",
                                             "bg-white transition-all duration-500 ease-out",
                                             "border border-gray-100",
                                             "shadow-md hover:shadow-2xl",
@@ -69,7 +69,7 @@ export default function BlogPage() {
                                             "hover:border-brand-orange/20"
                                         )}
                                     >
-                                        <div className="relative w-full h-[240px] md:h-[260px] lg:h-[280px] overflow-hidden">
+                                        <div className="relative w-full h-[200px] md:h-[220px] lg:h-[240px] overflow-hidden">
                                             <Image
                                                 src={post.image}
                                                 alt={post.title}
@@ -96,9 +96,9 @@ export default function BlogPage() {
                                             </div>
                                         </div>
 
-                                        <div className="p-4 md:p-5 lg:p-6 flex flex-col flex-1">
-                                            <div className="flex-1 space-y-2 md:space-y-2.5 mb-3 md:mb-4">
-                                                <h2 className="text-md md:text-lg lg:text-xl font-bold text-gray-900 group-hover:text-brand-blue transition-colors duration-300 leading-tight line-clamp-2">
+                                        <div className="p-3 md:p-4 lg:p-5 flex flex-col flex-1">
+                                            <div className="flex-1 space-y-1.5 md:space-y-2 mb-2 md:mb-3">
+                                                <h2 className="text-sm md:text-base lg:text-lg font-bold text-gray-900 group-hover:text-brand-blue transition-colors duration-300 leading-tight line-clamp-2">
                                                     {post.title}
                                                 </h2>
                                                 <p className="text-gray-600 text-xs md:text-sm leading-relaxed line-clamp-2">
@@ -110,15 +110,16 @@ export default function BlogPage() {
                                                 </div>
                                             </div>
 
-                                            <div className="mt-auto pt-3 md:pt-4 border-t border-gray-100 flex items-center justify-end gap-2 md:gap-3">
-                                                <div className="flex items-center gap-1.5 md:gap-2 text-brand-orange font-semibold group-hover:gap-2 md:group-hover:gap-2.5 transition-all duration-300 flex-shrink-0">
+                                            <div className="mt-auto pt-2 md:pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                                                <span className="text-[10px] md:text-xs text-gray-500 truncate">{post.author}</span>
+                                                <div className="flex items-center gap-1.5 md:gap-2 text-brand-orange font-semibold group-hover:gap-2 transition-all duration-300 flex-shrink-0">
                                                     <span className="text-xs md:text-sm whitespace-nowrap">Read more</span>
                                                     <ArrowRight className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform duration-300 flex-shrink-0" />
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                                        <div className="absolute inset-0 rounded-xl md:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                                             <div className="absolute inset-0 bg-gradient-to-br from-brand-orange/5 via-transparent to-brand-blue/5 rounded-2xl" />
                                         </div>
                                     </article>

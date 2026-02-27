@@ -53,27 +53,14 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                         priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+                </section>
 
-                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-12 lg:p-16 z-10">
-                        <div className="container mx-auto max-w-6xl">
-                            <div className="max-w-3xl space-y-3 sm:space-y-4">
-                                <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-wrap">
-                                    <div className="flex items-center gap-1.5 md:gap-2 bg-white/90 backdrop-blur-sm px-2.5 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full">
-                                        <span className="text-xs sm:text-xs md:text-sm font-semibold text-gray-800">{post.category}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5 md:gap-2 bg-white/90 backdrop-blur-sm px-2.5 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full">
-                                        <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-brand-orange" />
-                                        <span className="text-xs sm:text-xs md:text-sm font-semibold text-gray-800">{post.readTime}</span>
-                                    </div>
-                                </div>
-                                <h1 className="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-white leading-tight">
-                                    {post.title}
-                                </h1>
-                                <p className="text-white/90 text-xs sm:text-sm md:text-base lg:text-lg max-w-2xl">
-                                    {post.excerpt}
-                                </p>
-                            </div>
-                        </div>
+                {/* Title */}
+                <section className="py-6 md:py-8 bg-white">
+                    <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 text-center leading-tight">
+                            {post.title}
+                        </h1>
                     </div>
                 </section>
 
@@ -91,33 +78,24 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-12">
                             <div className="lg:col-span-2 space-y-6 md:space-y-8">
-                                <div className="flex flex-wrap items-center gap-3 md:gap-4 text-sm text-gray-500">
+                                <div className="flex flex-wrap items-center gap-3 md:gap-4 text-xs md:text-sm text-gray-500">
                                     <span className="flex items-center gap-1.5">
                                         <User className="w-4 h-4 text-brand-orange" />
                                         {post.author}
                                     </span>
                                     <span className="flex items-center gap-1.5">
                                         <Calendar className="w-4 h-4 text-brand-orange" />
-                                        {new Date(post.publishedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                                        {new Date(post.publishedAt).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                                    </span>
+                                    <span className="flex items-center gap-1.5">
+                                        <Clock className="w-4 h-4 text-brand-orange" />
+                                        {post.readTime}
                                     </span>
                                 </div>
 
                                 <div className="prose prose-gray max-w-none">
                                     {formatBlogContent(post.content)}
                                 </div>
-
-                                {post.tags && post.tags.length > 0 && (
-                                    <div className="flex flex-wrap gap-2 pt-4">
-                                        {post.tags.map((tag) => (
-                                            <span
-                                                key={tag}
-                                                className="text-xs md:text-sm px-2.5 py-1 bg-brand-blue/10 text-brand-blue rounded-md font-medium border border-brand-blue/10"
-                                            >
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
                             </div>
 
                             <div className="lg:col-span-1">

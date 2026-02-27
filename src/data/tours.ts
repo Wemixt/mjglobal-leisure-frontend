@@ -18,12 +18,19 @@ export const tours: Tour[] = [
             "Healthy Sri Lankan cuisine and cooking demonstrations"
         ],
         bestTime: "November to April",
+        packageDescription: "This 7-day luxury wellness tour offers an immersive journey blending yoga, Ayurveda, culture, and wildlife. Sri Lanka's ancient heritage, misty mountains, and pristine nature create the perfect backdrop for rejuvenation.\n\nYour journey begins in Colombo with a wellness welcome—gentle yoga, a curated dinner, and rest at a luxury hotel. From there, travel to Kandy, a UNESCO World Heritage city, for sunrise yoga, spice garden visits, Ayurvedic treatments, and meditation. The tour continues to Habarana and Dambulla's ancient Cave Temple, then to Wilpattu National Park for thrilling jeep safaris amid leopards, elephants, and exotic birds. End each day with campfire dinners, herbal teas, and starlit meditation.",
         tourOverview: "This carefully curated journey blends wellness, culture, and wildlife to give you the most authentic Sri Lankan experience. From the vibrant city of Colombo to the sacred city of Kandy, the tranquil landscapes of Habarana, and the wild beauty of Wilpattu National Park, every step is designed to rejuvenate your body and soul. Enjoy yoga sessions with breathtaking backdrops, Ayurveda therapies, cultural immersions, and thrilling safaris.",
         destinationsHighlights: "Your journey begins in Colombo, Sri Lanka's bustling capital, where a warm welcome awaits. After settling into a luxury wellness hotel, you can unwind with gentle yoga and a specially curated wellness dinner, perfectly setting the tone for relaxation. Colombo offers a charming blend of colonial history, vibrant lifestyle, and coastal serenity. From there, the journey takes you into the lush highlands of Kandy, a UNESCO World Heritage city and the island's last royal capital. Home to the revered Temple of the Sacred Tooth Relic, Kandy is a spiritual and cultural hub where you'll experience sunrise yoga with misty mountain views, explore spice gardens in Mawanella, and rejuvenate with traditional Ayurvedic treatments. Evening meditation and hands-on cooking demonstrations add to the wellness-inspired retreat.\n\nThe tour continues to Dambulla and Habarana, where you'll visit the ancient Dambulla Cave Temple, dating back to the 1st century BC and filled with stunning murals and Buddha statues. In nearby Habarana, you'll check into a wellness retreat surrounded by nature, perfectly placed in Sri Lanka's cultural triangle near Sigiriya Rock Fortress, serene lakes, and lush forests. Here, Ayurveda massages and tranquil nature walks enhance your holistic experience. Finally, the adventure concludes at Wilpattu National Park, one of Sri Lanka's largest and oldest reserves. Famous for its natural \"villus\" or lakes, Wilpattu is also one of the world's top leopard-spotting destinations, alongside elephants, sloth bears, and exotic birdlife. Staying in a luxury eco-lodge or safari camp, you'll embark on thrilling jeep safaris and end the day with campfire dinners, herbal teas, and starlit meditation.\n\nThis tour is the perfect balance of wellness and adventure. With daily yoga and meditation sessions in breathtaking settings, visits to UNESCO World Heritage Sites like Kandy, the Temple of the Tooth, and the Dambulla Caves, authentic Ayurvedic treatments paired with healthy Sri Lankan cuisine, and a thrilling wildlife safari at Wilpattu, every moment is designed to rejuvenate both body and soul. The journey is completed with stays in luxury wellness resorts and boutique eco-lodges, offering comfort, authenticity, and connection to nature throughout.",
         itinerary: [
             {
                 day: 1,
                 title: "Arrival – Colombo (Wellness Welcome)",
+                briefTitle: "Airport → Colombo",
+                hasDriver: true,
+                location: "Colombo",
+                dayDescription: "Welcome to Sri Lanka. On arrival you will be met by your guide and transferred to your hotel in Colombo. After check-in, enjoy a gentle evening yoga session to unwind, followed by a specially curated wellness dinner. Overnight in Colombo.",
+                destinations: ["Colombo"],
+                thingsToDo: ["Airport transfer", "Hotel check-in", "Evening yoga", "Wellness dinner"],
                 items: [
                     "Arrival – Colombo (Wellness Welcome)",
                     "Distance/Time: Bandaranaike International Airport → Colombo (35 km / 1 hr)",
@@ -37,6 +44,12 @@ export const tours: Tour[] = [
             {
                 day: 2,
                 title: "Colombo – Kandy (Cultural City & Yoga Retreat)",
+                briefTitle: "Colombo → Kandy",
+                hasDriver: true,
+                location: "Kandy",
+                dayDescription: "Morning yoga and healthy breakfast, then a scenic drive to Kandy through the lush countryside. Visit a spice garden in Mawanella to learn about Ayurvedic herbs, then check in at your luxury wellness resort. Evening yoga and meditation with hill country views. Overnight in Kandy.",
+                destinations: ["Kandy", "Mawanella"],
+                thingsToDo: ["Scenic drive", "Spice garden visit", "Wellness resort check-in", "Evening yoga & meditation"],
                 items: [
                     "Colombo – Kandy (Cultural City & Yoga Retreat)",
                     "Distance/Time: Colombo → Kandy (115 km / 3.5 hrs)",
@@ -51,6 +64,8 @@ export const tours: Tour[] = [
             {
                 day: 3,
                 title: "Kandy (Wellness, Temple & Nature Walk)",
+                briefTitle: "Kandy",
+                hasDriver: false,
                 items: [
                     "Kandy (Wellness, Temple & Nature Walk)",
                     "Sunrise yoga overlooking the misty mountains",
@@ -64,6 +79,8 @@ export const tours: Tour[] = [
             {
                 day: 4,
                 title: "Kandy (Local Experience + Wellness Day)",
+                briefTitle: "Kandy",
+                hasDriver: false,
                 items: [
                     "Kandy (Local Experience + Wellness Day)",
                     "Optional outdoor yoga in a traditional village setting",
@@ -76,6 +93,8 @@ export const tours: Tour[] = [
             {
                 day: 5,
                 title: "Kandy – Habarana (Cave Temple & Wildlife Touch)",
+                briefTitle: "Kandy → Habarana",
+                hasDriver: true,
                 items: [
                     "Kandy – Habarana (Cave Temple & Wildlife Touch)",
                     "Distance/Time: Kandy → Dambulla → Habarana (95 km / 3.5 hrs)",
@@ -89,6 +108,8 @@ export const tours: Tour[] = [
             {
                 day: 6,
                 title: "Habarana – Wilpattu (Safari & Nature Healing)",
+                briefTitle: "Habarana → Wilpattu",
+                hasDriver: true,
                 items: [
                     "Habarana – Wilpattu (Safari & Nature Healing)",
                     "Distance/Time: Habarana → Wilpattu (100 km / 2 hrs)",
@@ -102,6 +123,8 @@ export const tours: Tour[] = [
             {
                 day: 7,
                 title: "Wilpattu – Departure",
+                briefTitle: "Wilpattu → Airport",
+                hasDriver: true,
                 items: [
                     "Wilpattu – Departure",
                     "Distance/Time: Wilpattu → Bandaranaike International Airport (160 km / 3 hrs)",

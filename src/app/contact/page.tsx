@@ -20,16 +20,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const subjectOptions = [
-  { value: "", label: "Select a subject" },
-  { value: "general", label: "General Inquiry" },
-  { value: "booking", label: "Booking & Reservations" },
-  { value: "custom", label: "Custom Tour Request" },
-  { value: "partnership", label: "Partnership & B2B" },
-  { value: "feedback", label: "Feedback & Support" },
-  { value: "other", label: "Other" },
-];
-
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: "",
@@ -56,10 +46,12 @@ export default function ContactPage() {
 
   const validate = () => {
     const errors: Record<string, string> = {};
-    if (!formData.name.trim()) errors.name = "Name is required";
+    if (!formData.name.trim()) errors.name = "Your name is required";
     if (!formData.email.trim()) errors.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Enter a valid email";
-    if (!formData.message.trim()) errors.message = "Message is required";
+    if (!formData.phone.trim()) errors.phone = "Phone number is required";
+    if (!formData.subject.trim()) errors.subject = "Subject is required";
+    if (!formData.message.trim()) errors.message = "Your message is required";
     return errors;
   };
 
@@ -269,7 +261,7 @@ export default function ContactPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                     <div className="space-y-2">
                       <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
-                        Full Name <span className="text-brand-orange">*</span>
+                        Your Name <span className="text-brand-orange">*</span>
                       </label>
                       <input
                         id="name"
@@ -278,7 +270,7 @@ export default function ContactPage() {
                         value={formData.name}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        placeholder="John Doe"
+                        placeholder="Your Name"
                         className={cn(
                           "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
                           "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
@@ -292,7 +284,7 @@ export default function ContactPage() {
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
-                        Email <span className="text-brand-orange">*</span>
+                        Your Email <span className="text-brand-orange">*</span>
                       </label>
                       <input
                         id="email"
@@ -301,7 +293,7 @@ export default function ContactPage() {
                         value={formData.email}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        placeholder="john@example.com"
+                        placeholder="Your Email"
                         className={cn(
                           "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
                           "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
@@ -315,54 +307,57 @@ export default function ContactPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                    <div className="space-y-2">
-                      <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">
-                        Phone
-                      </label>
-                      <input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        placeholder="+94 77 123 4567"
-                        className={cn(
-                          "w-full px-4 py-3 md:py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
-                          "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                          "text-sm md:text-base"
-                        )}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="subject" className="block text-sm font-semibold text-gray-700">
-                        Subject
-                      </label>
-                      <select
-                        id="subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className={cn(
-                          "w-full px-4 py-3 md:py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-900",
-                          "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                          "text-sm md:text-base appearance-none cursor-pointer"
-                        )}
-                      >
-                        {subjectOptions.map((opt) => (
-                          <option key={opt.value || "empty"} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                  <div className="space-y-2">
+                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">
+                      Phone Number <span className="text-brand-orange">*</span>
+                    </label>
+                    <input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      placeholder="+94771234567"
+                      className={cn(
+                        "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                        "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                        "text-sm md:text-base",
+                        touched.phone && errors.phone ? "border-red-400" : "border-gray-200"
+                      )}
+                    />
+                    {touched.phone && errors.phone && (
+                      <p className="text-sm text-red-500">{errors.phone}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="subject" className="block text-sm font-semibold text-gray-700">
+                      Subject <span className="text-brand-orange">*</span>
+                    </label>
+                    <input
+                      id="subject"
+                      name="subject"
+                      type="text"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      placeholder="Subject"
+                      className={cn(
+                        "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                        "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                        "text-sm md:text-base",
+                        touched.subject && errors.subject ? "border-red-400" : "border-gray-200"
+                      )}
+                    />
+                    {touched.subject && errors.subject && (
+                      <p className="text-sm text-red-500">{errors.subject}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <label htmlFor="message" className="block text-sm font-semibold text-gray-700">
-                      Message <span className="text-brand-orange">*</span>
+                      Your Message <span className="text-brand-orange">*</span>
                     </label>
                     <textarea
                       id="message"
@@ -370,7 +365,7 @@ export default function ContactPage() {
                       value={formData.message}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      placeholder="Tell us about your travel plans, questions, or how we can help..."
+                      placeholder="Your Message"
                       rows={5}
                       className={cn(
                         "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400 resize-y min-h-[120px]",
