@@ -102,24 +102,6 @@ export default function PopularActivities() {
                       {activity.description}
                     </p>
                   </div>
-                  
-                  {/* CTA Button */}
-                  <button
-                    className={cn(
-                      "mt-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg",
-                      "bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white",
-                      "font-semibold text-xs md:text-sm transition-all duration-300",
-                      "group-hover:bg-white group-hover:text-brand-orange group-hover:border-white",
-                      "transform group-hover:translate-x-1"
-                    )}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Handle activity selection
-                    }}
-                  >
-                    Explore More
-                    <ArrowRight size={14} className="transition-transform duration-300 group-hover:translate-x-1" />
-                  </button>
                 </div>
 
                 {/* Decorative Element */}
@@ -131,21 +113,6 @@ export default function PopularActivities() {
           ))}
         </div>
 
-        {/* View All Button */}
-        <div className="flex justify-center mt-12 md:mt-12">
-          <button
-            className={cn(
-              "px-6 md:px-8 py-2.5 md:py-3 rounded-xl",
-              "bg-brand-orange text-white font-semibold text-sm md:text-base uppercase tracking-wide",
-              "hover:bg-brand-orange/90 transition-all duration-300",
-              "shadow-lg hover:shadow-xl transform hover:-translate-y-1",
-              "flex items-center gap-2"
-            )}
-          >
-            View All Activities
-            <ArrowRight size={16} />
-          </button>
-        </div>
       </div>
     </section>
   );

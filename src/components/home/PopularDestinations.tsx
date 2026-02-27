@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -31,15 +32,14 @@ interface Destination {
   id: number;
   name: string;
   image: string;
-  listingCount: string;
 }
 
 const destinations: Destination[] = [
-  { id: 1, name: "Down South", image: "/images/destinations/Down south.png", listingCount: "15 Listing" },
-  { id: 2, name: "Udawalawa", image: "/images/destinations/Udawalawa.png", listingCount: "2K Listing" },
-  { id: 3, name: "Kandy", image: "/images/destinations/Kandy.png", listingCount: "9K Listing" },
-  { id: 4, name: "Yala", image: "/images/destinations/yala.png", listingCount: "5K Listing" },
-  { id: 5, name: "Sigiriya", image: "/images/destinations/Sigiriya.png", listingCount: "3K Listing" },
+  { id: 1, name: "Down South", image: "/images/destinations/Down south.png" },
+  { id: 2, name: "Udawalawa", image: "/images/destinations/Udawalawa.png" },
+  { id: 3, name: "Kandy", image: "/images/destinations/Kandy.png" },
+  { id: 4, name: "Yala", image: "/images/destinations/yala.png" },
+  { id: 5, name: "Sigiriya", image: "/images/destinations/Sigiriya.png" },
 ];
 
 export default function PopularDestinations() {
@@ -86,7 +86,7 @@ export default function PopularDestinations() {
       };
     } else if (position === -1 || position === 1) {
       // Immediate side cards
-      const translateX = isMobile ? position * 200 : position * 320; // Less overlap on mobile
+      const translateX = isMobile ? position * 180 : position * 280;
       const scale = isMobile ? 0.75 : 0.85;
       return {
         translateX: translateX,
@@ -97,7 +97,7 @@ export default function PopularDestinations() {
       };
     } else if (position === -2 || position === 2) {
       // Far side cards
-      const translateX = isMobile ? position * 180 : position * 280;
+      const translateX = isMobile ? position * 160 : position * 250;
       const scale = isMobile ? 0.6 : 0.7;
       return {
         translateX: translateX,
@@ -141,15 +141,15 @@ export default function PopularDestinations() {
         </div>
       </div>
 
-      {/* Carousel Container - Full width for proper centering */}
-      <div className="relative h-[420px] md:h-[520px] w-full flex items-center justify-center overflow-hidden">
+      {/* Carousel Container - Full width for proper centering (reduced card size) */}
+      <div className="relative h-[360px] md:h-[440px] w-full flex items-center justify-center overflow-hidden">
         <div className="relative w-full h-full max-w-full" style={{ isolation: 'isolate', contain: 'layout style paint' }}>
           {destinations.map((destination, index) => {
             const position = getCardPosition(index);
             const style = getCardStyle(position);
             const isActive = position === 0;
-            const cardWidth = isMobile ? 300 : 400;
-            const cardHeight = isMobile ? 420 : 520;
+            const cardWidth = isMobile ? 260 : 340;
+            const cardHeight = isMobile ? 360 : 440;
 
             return (
               <div
@@ -188,30 +188,23 @@ export default function PopularDestinations() {
                   <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black/80 via-black/60 to-transparent" />
 
                   {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
-                    <div className="space-y-1 md:space-y-2">
-                      <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
-                        {destination.name}
-                      </h3>
-                      <p className="text-white/90 text-xs md:text-sm lg:text-base">
-                        {destination.listingCount}
-                      </p>
-                    </div>
+                  <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-3">
+                    <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-white">
+                      {destination.name}
+                    </h3>
 
-                    <button
+                    <Link
+                      href="/destinations"
                       className={cn(
-                        "flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-xl border-2 border-white text-white text-sm md:text-base font-semibold transition-all whitespace-nowrap",
+                        "flex items-center gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-xl border-2 border-white text-white text-xs md:text-sm font-semibold transition-all whitespace-nowrap",
                         "hover:bg-white hover:text-brand-blue",
-                        !isActive && "opacity-50"
+                        !isActive && "opacity-50 pointer-events-none"
                       )}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Handle view all action
-                      }}
+                      onClick={(e) => e.stopPropagation()}
                     >
                       View All
-                      <ArrowRight size={16} className="md:w-[18px] md:h-[18px]" />
-                    </button>
+                      <ArrowRight size={14} className="md:w-4 md:h-4" />
+                    </Link>
                   </div>
                 </div>
               </div>

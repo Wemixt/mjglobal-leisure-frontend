@@ -1,17 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { notFound, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
-import { getTourBySlug } from "@/data/tours";
-import { ArrowLeft, Clock, Calendar, Users, CheckCircle2, Send, MapPin } from "lucide-react";
+import { useTourBySlug } from "@/hooks";
+import { bookingsService } from "@/api/services/bookings.service";
+import { ArrowLeft, Clock, Calendar, Users, User, Phone, Mail, Globe, MessageCircle, CheckCircle2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const countries = [
-    { value: "", label: "Select your country" },
+    { value: "", label: "-- Select country --" },
     { value: "US", label: "United States" },
     { value: "UK", label: "United Kingdom" },
     { value: "CA", label: "Canada" },
@@ -47,26 +48,22 @@ const countries = [
 
 export default function BookingPage() {
     const params = useParams();
-    const slug = params.slug as string;
-    const tour = getTourBySlug(slug);
+    const slug = params.slug as string | undefined;
+    const { data: tour, error, isLoading } = useTourBySlug(slug ?? null);
 
     const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        phone: "",
-        country: "",
-        passengers: "",
         arrivalDate: "",
-        departureDate: "",
-        specialRequests: "",
+        passengers: "",
+        name: "",
+        phoneNumber: "",
+        whatsapp: "",
+        email: "",
+        country: "",
+        clientMessage: "",
     });
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
-
-    if (!tour) {
-        notFound();
-    }
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -82,14 +79,21 @@ export default function BookingPage() {
 
     const validate = () => {
         const errors: Record<string, string> = {};
+        if (!formData.arrivalDate) errors.arrivalDate = "Arrival date is required";
+        if (!formData.passengers) errors.passengers = "Total no of pax is required";
         if (!formData.name.trim()) errors.name = "Name is required";
+        if (!formData.phoneNumber.trim()) errors.phoneNumber = "Phone number is required";
+        else if (!/^\+\d{6,15}$/.test(formData.phoneNumber)) {
+            errors.phoneNumber = "Enter phone with country code, e.g. +1234567890";
+        }
+        if (!formData.whatsapp.trim()) errors.whatsapp = "WhatsApp number is required";
+        else if (!/^\+\d{6,15}$/.test(formData.whatsapp)) {
+            errors.whatsapp = "Enter WhatsApp with country code, e.g. +1234567890";
+        }
         if (!formData.email.trim()) errors.email = "Email is required";
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Enter a valid email";
-        if (!formData.phone.trim()) errors.phone = "Phone number is required";
         if (!formData.country) errors.country = "Country is required";
-        if (!formData.passengers) errors.passengers = "Number of passengers is required";
-        else if (parseInt(formData.passengers) < 1) errors.passengers = "At least 1 passenger required";
-        if (!formData.arrivalDate) errors.arrivalDate = "Arrival date is required";
+        if (!formData.clientMessage.trim()) errors.clientMessage = "Message is required";
         return errors;
     };
 
@@ -99,31 +103,42 @@ export default function BookingPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setTouched({
-            name: true,
-            email: true,
-            phone: true,
-            country: true,
-            passengers: true,
             arrivalDate: true,
+            passengers: true,
+            name: true,
+            phoneNumber: true,
+            whatsapp: true,
+            email: true,
+            country: true,
+            clientMessage: true,
         });
-        if (!isValid) return;
+        if (!isValid || !tour) return;
 
         setIsSubmitting(true);
         setSubmitStatus("idle");
 
         try {
-            // Simulate API call – replace with your backend/API route
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+            await bookingsService.create({
+                tourPackageId: tour.id,
+                name: formData.name.trim(),
+                email: formData.email.trim(),
+                phoneNumber: formData.phoneNumber.trim(),
+                country: formData.country,
+                whatsapp: formData.whatsapp.trim(),
+                arrivalDate: new Date(formData.arrivalDate).toISOString(),
+                passengers: Number(formData.passengers),
+                clientMessage: formData.clientMessage.trim(),
+            });
             setSubmitStatus("success");
             setFormData({
-                name: "",
-                email: "",
-                phone: "",
-                country: "",
-                passengers: "",
                 arrivalDate: "",
-                departureDate: "",
-                specialRequests: "",
+                passengers: "",
+                name: "",
+                phoneNumber: "",
+                whatsapp: "",
+                email: "",
+                country: "",
+                clientMessage: "",
             });
             setTouched({});
         } catch {
@@ -140,18 +155,22 @@ export default function BookingPage() {
             <main className="relative z-10">
                 {/* Hero Section */}
                 <section className="relative w-full h-[40vh] md:h-[45vh] lg:h-[50vh] overflow-hidden">
-                    <Image
-                        src={tour.image}
-                        alt={tour.title}
-                        fill
-                        className="object-cover"
-                        priority
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+                    {tour && (
+                        <>
+                            <Image
+                                src={tour.heroImage}
+                                alt={tour.name}
+                                fill
+                                className="object-cover"
+                                priority
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+                        </>
+                    )}
 
                     <div className="absolute top-4 md:top-6 left-3 sm:left-4 md:left-6 z-20">
                         <Link
-                            href={`/tours/${slug}`}
+                            href={slug ? `/tours/${slug}` : "/tours"}
                             className="flex items-center gap-1.5 md:gap-2 bg-white/90 backdrop-blur-sm px-2.5 py-1.5 sm:px-3 sm:py-2 md:px-4 md:py-3 rounded-full shadow-lg hover:bg-white transition-all group"
                         >
                             <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-gray-800 group-hover:-translate-x-1 transition-transform" />
@@ -163,7 +182,7 @@ export default function BookingPage() {
                         <div className="container mx-auto max-w-6xl">
                             <div className="max-w-3xl">
                                 <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight mb-2">
-                                    Book: {tour.title}
+                                    {tour ? `Book: ${tour.name}` : "Book this package"}
                                 </h1>
                                 <p className="text-white/90 text-xs sm:text-sm md:text-base max-w-2xl">
                                     Complete your booking by filling out the form below
@@ -183,39 +202,51 @@ export default function BookingPage() {
                                     <div className="bg-white rounded-xl md:rounded-2xl p-4 sm:p-4 md:p-5 lg:p-6 shadow-md border border-gray-100">
                                         <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-gray-900 mb-4 md:mb-5">Tour Summary</h3>
                                         
-                                        <div className="relative w-full h-48 sm:h-56 md:h-64 rounded-lg overflow-hidden mb-4">
-                                            <Image
-                                                src={tour.image}
-                                                alt={tour.title}
-                                                fill
-                                                className="object-cover"
-                                            />
-                                        </div>
+                                        {tour ? (
+                                            <>
+                                                <div className="relative w-full h-48 sm:h-56 md:h-64 rounded-lg overflow-hidden mb-4">
+                                                    <Image
+                                                        src={tour.heroImage}
+                                                        alt={tour.name}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                </div>
 
-                                        <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-3">{tour.title}</h4>
+                                                <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-3">{tour.name}</h4>
 
-                                        <div className="space-y-3 md:space-y-4">
-                                            <div className="flex items-start gap-2.5 md:gap-3">
-                                                <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-brand-orange/10 flex items-center justify-center">
-                                                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-brand-orange" />
-                                                </div>
-                                                <div>
-                                                    <h5 className="text-xs md:text-sm font-semibold text-gray-900 mb-0.5">Duration</h5>
-                                                    <p className="text-gray-500 text-xs md:text-sm">{tour.duration}</p>
-                                                </div>
-                                            </div>
-                                            {tour.bestTime && (
-                                                <div className="flex items-start gap-2.5 md:gap-3">
-                                                    <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-brand-blue/10 flex items-center justify-center">
-                                                        <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-brand-blue" />
+                                                <div className="space-y-3 md:space-y-4">
+                                                    <div className="flex items-start gap-2.5 md:gap-3">
+                                                        <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-brand-orange/10 flex items-center justify-center">
+                                                            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-brand-orange" />
+                                                        </div>
+                                                        <div>
+                                                            <h5 className="text-xs md:text-sm font-semibold text-gray-900 mb-0.5">Duration</h5>
+                                                            <p className="text-gray-500 text-xs md:text-sm">
+                                                                {tour.packageDuration || `${tour.totalDays} Days`}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <h5 className="text-xs md:text-sm font-semibold text-gray-900 mb-0.5">Best time</h5>
-                                                        <p className="text-gray-500 text-xs md:text-sm">{tour.bestTime}</p>
+                                                    <div className="flex items-start gap-2.5 md:gap-3">
+                                                        <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-brand-blue/10 flex items-center justify-center">
+                                                            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-brand-blue" />
+                                                        </div>
+                                                        <div>
+                                                            <h5 className="text-xs md:text-sm font-semibold text-gray-900 mb-0.5">Package type</h5>
+                                                            <p className="text-gray-500 text-xs md:text-sm">{tour.packageType}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-xs md:text-sm text-gray-600">
+                                                        <span className="font-semibold text-gray-900">From ${tour.price}</span>
+                                                        {tour.minPeople ? ` · Min ${tour.minPeople} people` : null}
                                                     </div>
                                                 </div>
-                                            )}
-                                        </div>
+                                            </>
+                                        ) : (
+                                            <p className="text-sm text-gray-500">
+                                                {isLoading ? "Loading tour details..." : error || "Tour details not available."}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -268,8 +299,63 @@ export default function BookingPage() {
                                             <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                                                     <div className="space-y-2">
-                                                        <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
-                                                            Full Name <span className="text-brand-orange">*</span>
+                                                        <label htmlFor="arrivalDate" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Calendar className="w-4 h-4 text-gray-500" />
+                                                            Arrival Date <span className="text-brand-orange">*</span>
+                                                        </label>
+                                                        <input
+                                                            id="arrivalDate"
+                                                            name="arrivalDate"
+                                                            type="date"
+                                                            value={formData.arrivalDate}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            min={new Date().toISOString().split("T")[0]}
+                                                            className={cn(
+                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900",
+                                                                "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                                                                "text-sm md:text-base",
+                                                                touched.arrivalDate && errors.arrivalDate ? "border-red-400" : "border-gray-200"
+                                                            )}
+                                                        />
+                                                        {touched.arrivalDate && errors.arrivalDate && (
+                                                            <p className="text-sm text-red-500">{errors.arrivalDate}</p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="passengers" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Users className="w-4 h-4 text-gray-500" />
+                                                            Total No Of Pax <span className="text-brand-orange">*</span>
+                                                        </label>
+                                                        <select
+                                                            id="passengers"
+                                                            name="passengers"
+                                                            value={formData.passengers}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            className={cn(
+                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900",
+                                                                "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                                                                "text-sm md:text-base appearance-none cursor-pointer",
+                                                                touched.passengers && errors.passengers ? "border-red-400" : "border-gray-200"
+                                                            )}
+                                                        >
+                                                            <option value="">--select--</option>
+                                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                                                                <option key={n} value={n}>{n}</option>
+                                                            ))}
+                                                        </select>
+                                                        {touched.passengers && errors.passengers && (
+                                                            <p className="text-sm text-red-500">{errors.passengers}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="name" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <User className="w-4 h-4 text-gray-500" />
+                                                            Name <span className="text-brand-orange">*</span>
                                                         </label>
                                                         <input
                                                             id="name"
@@ -278,7 +364,7 @@ export default function BookingPage() {
                                                             value={formData.name}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
-                                                            placeholder="John Doe"
+                                                            placeholder="Full name"
                                                             className={cn(
                                                                 "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
                                                                 "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
@@ -291,8 +377,60 @@ export default function BookingPage() {
                                                         )}
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
-                                                            Email <span className="text-brand-orange">*</span>
+                                                        <label htmlFor="phoneNumber" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Phone className="w-4 h-4 text-gray-500" />
+                                                            Phone Number (with country code) <span className="text-brand-orange">*</span>
+                                                        </label>
+                                                        <input
+                                                            id="phoneNumber"
+                                                            name="phoneNumber"
+                                                            type="tel"
+                                                            value={formData.phoneNumber}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            placeholder="+1234567890"
+                                                            className={cn(
+                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                                                                "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                                                                "text-sm md:text-base",
+                                                                touched.phoneNumber && errors.phoneNumber ? "border-red-400" : "border-gray-200"
+                                                            )}
+                                                        />
+                                                        {touched.phoneNumber && errors.phoneNumber && (
+                                                            <p className="text-sm text-red-500">{errors.phoneNumber}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="whatsapp" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Phone className="w-4 h-4 text-gray-500" />
+                                                            WhatsApp (with country code) <span className="text-brand-orange">*</span>
+                                                        </label>
+                                                        <input
+                                                            id="whatsapp"
+                                                            name="whatsapp"
+                                                            type="tel"
+                                                            value={formData.whatsapp}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            placeholder="+1234567890"
+                                                            className={cn(
+                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                                                                "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                                                                "text-sm md:text-base",
+                                                                touched.whatsapp && errors.whatsapp ? "border-red-400" : "border-gray-200"
+                                                            )}
+                                                        />
+                                                        {touched.whatsapp && errors.whatsapp && (
+                                                            <p className="text-sm text-red-500">{errors.whatsapp}</p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="email" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Mail className="w-4 h-4 text-gray-500" />
+                                                            Email Address <span className="text-brand-orange">*</span>
                                                         </label>
                                                         <input
                                                             id="email"
@@ -301,7 +439,7 @@ export default function BookingPage() {
                                                             value={formData.email}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
-                                                            placeholder="john@example.com"
+                                                            placeholder="Email Address"
                                                             className={cn(
                                                                 "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
                                                                 "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
@@ -317,30 +455,8 @@ export default function BookingPage() {
 
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                                                     <div className="space-y-2">
-                                                        <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">
-                                                            Phone Number <span className="text-brand-orange">*</span>
-                                                        </label>
-                                                        <input
-                                                            id="phone"
-                                                            name="phone"
-                                                            type="tel"
-                                                            value={formData.phone}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            placeholder="+94 77 123 4567"
-                                                            className={cn(
-                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
-                                                                "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                                                                "text-sm md:text-base",
-                                                                touched.phone && errors.phone ? "border-red-400" : "border-gray-200"
-                                                            )}
-                                                        />
-                                                        {touched.phone && errors.phone && (
-                                                            <p className="text-sm text-red-500">{errors.phone}</p>
-                                                        )}
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label htmlFor="country" className="block text-sm font-semibold text-gray-700">
+                                                        <label htmlFor="country" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Globe className="w-4 h-4 text-gray-500" />
                                                             Country <span className="text-brand-orange">*</span>
                                                         </label>
                                                         <select
@@ -366,97 +482,30 @@ export default function BookingPage() {
                                                             <p className="text-sm text-red-500">{errors.country}</p>
                                                         )}
                                                     </div>
-                                                </div>
-
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                                                     <div className="space-y-2">
-                                                        <label htmlFor="passengers" className="block text-sm font-semibold text-gray-700">
-                                                            Number of Passengers <span className="text-brand-orange">*</span>
+                                                        <label htmlFor="clientMessage" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <MessageCircle className="w-4 h-4 text-gray-500" />
+                                                            Message <span className="text-brand-orange">*</span>
                                                         </label>
-                                                        <input
-                                                            id="passengers"
-                                                            name="passengers"
-                                                            type="number"
-                                                            min="1"
-                                                            max="20"
-                                                            value={formData.passengers}
+                                                        <textarea
+                                                            id="clientMessage"
+                                                            name="clientMessage"
+                                                            value={formData.clientMessage}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
-                                                            placeholder="2"
+                                                            placeholder="Enter your message"
+                                                            rows={4}
                                                             className={cn(
-                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400 resize-y min-h-[100px]",
                                                                 "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
                                                                 "text-sm md:text-base",
-                                                                touched.passengers && errors.passengers ? "border-red-400" : "border-gray-200"
+                                                                touched.clientMessage && errors.clientMessage ? "border-red-400" : "border-gray-200"
                                                             )}
                                                         />
-                                                        {touched.passengers && errors.passengers && (
-                                                            <p className="text-sm text-red-500">{errors.passengers}</p>
+                                                        {touched.clientMessage && errors.clientMessage && (
+                                                            <p className="text-sm text-red-500">{errors.clientMessage}</p>
                                                         )}
                                                     </div>
-                                                    <div className="space-y-2">
-                                                        <label htmlFor="arrivalDate" className="block text-sm font-semibold text-gray-700">
-                                                            Arrival Date <span className="text-brand-orange">*</span>
-                                                        </label>
-                                                        <input
-                                                            id="arrivalDate"
-                                                            name="arrivalDate"
-                                                            type="date"
-                                                            value={formData.arrivalDate}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            min={new Date().toISOString().split('T')[0]}
-                                                            className={cn(
-                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900",
-                                                                "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                                                                "text-sm md:text-base",
-                                                                touched.arrivalDate && errors.arrivalDate ? "border-red-400" : "border-gray-200"
-                                                            )}
-                                                        />
-                                                        {touched.arrivalDate && errors.arrivalDate && (
-                                                            <p className="text-sm text-red-500">{errors.arrivalDate}</p>
-                                                        )}
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-2">
-                                                    <label htmlFor="departureDate" className="block text-sm font-semibold text-gray-700">
-                                                        Departure Date (Optional)
-                                                    </label>
-                                                    <input
-                                                        id="departureDate"
-                                                        name="departureDate"
-                                                        type="date"
-                                                        value={formData.departureDate}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        min={formData.arrivalDate || new Date().toISOString().split('T')[0]}
-                                                        className={cn(
-                                                            "w-full px-4 py-3 md:py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-900",
-                                                            "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                                                            "text-sm md:text-base"
-                                                        )}
-                                                    />
-                                                </div>
-
-                                                <div className="space-y-2">
-                                                    <label htmlFor="specialRequests" className="block text-sm font-semibold text-gray-700">
-                                                        Special Requests or Notes
-                                                    </label>
-                                                    <textarea
-                                                        id="specialRequests"
-                                                        name="specialRequests"
-                                                        value={formData.specialRequests}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        placeholder="Any dietary requirements, accessibility needs, or special requests..."
-                                                        rows={4}
-                                                        className={cn(
-                                                            "w-full px-4 py-3 md:py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 resize-y min-h-[100px]",
-                                                            "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                                                            "text-sm md:text-base"
-                                                        )}
-                                                    />
                                                 </div>
 
                                                 {submitStatus === "error" && (

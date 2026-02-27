@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import { siteConfig } from "@/data/config";
+import { contactService } from "@/api/services";
 import {
   MapPin,
   Mail,
@@ -20,15 +21,12 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const subjectOptions = [
-  { value: "", label: "Select a subject" },
-  { value: "general", label: "General Inquiry" },
-  { value: "booking", label: "Booking & Reservations" },
-  { value: "custom", label: "Custom Tour Request" },
-  { value: "partnership", label: "Partnership & B2B" },
-  { value: "feedback", label: "Feedback & Support" },
-  { value: "other", label: "Other" },
-];
+/** Phone with + and country code, e.g. +94771234567 (E.164 style, 7–15 digits after +) */
+const PHONE_REGEX = /^\+[1-9]\d{6,14}$/;
+
+function normalizePhone(value: string): string {
+  return value.trim().replace(/\s/g, "");
+}
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -41,6 +39,7 @@ export default function ContactPage() {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -48,6 +47,7 @@ export default function ContactPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setSubmitStatus("idle");
+    setSubmitError(null);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -56,10 +56,14 @@ export default function ContactPage() {
 
   const validate = () => {
     const errors: Record<string, string> = {};
-    if (!formData.name.trim()) errors.name = "Name is required";
+    if (!formData.name.trim()) errors.name = "Your name is required";
     if (!formData.email.trim()) errors.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Enter a valid email";
-    if (!formData.message.trim()) errors.message = "Message is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) errors.email = "Enter a valid email";
+    const phoneNorm = normalizePhone(formData.phone);
+    if (!phoneNorm) errors.phone = "Phone number is required";
+    else if (!PHONE_REGEX.test(phoneNorm)) errors.phone = "Use + and country code (e.g. +94771234567)";
+    if (!formData.subject.trim()) errors.subject = "Subject is required";
+    if (!formData.message.trim()) errors.message = "Your message is required";
     return errors;
   };
 
@@ -69,19 +73,28 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched({ name: true, email: true, phone: true, subject: true, message: true });
+    setSubmitError(null);
     if (!isValid) return;
 
     setIsSubmitting(true);
     setSubmitStatus("idle");
 
     try {
-      // Simulate API call – replace with your backend/API route
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      const phoneno = normalizePhone(formData.phone);
+      await contactService.submit({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        Phoneno: phoneno,
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+      });
       setSubmitStatus("success");
       setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
       setTouched({});
-    } catch {
+    } catch (err: unknown) {
       setSubmitStatus("error");
+      const message = err && typeof err === "object" && "message" in err ? String((err as { message: string }).message) : null;
+      setSubmitError(message || "Something went wrong. Please try again or email us directly.");
     } finally {
       setIsSubmitting(false);
     }
@@ -269,7 +282,7 @@ export default function ContactPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                     <div className="space-y-2">
                       <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
-                        Full Name <span className="text-brand-orange">*</span>
+                        Your Name <span className="text-brand-orange">*</span>
                       </label>
                       <input
                         id="name"
@@ -278,7 +291,7 @@ export default function ContactPage() {
                         value={formData.name}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        placeholder="John Doe"
+                        placeholder="Your Name"
                         className={cn(
                           "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
                           "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
@@ -292,7 +305,7 @@ export default function ContactPage() {
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
-                        Email <span className="text-brand-orange">*</span>
+                        Your Email <span className="text-brand-orange">*</span>
                       </label>
                       <input
                         id="email"
@@ -301,7 +314,7 @@ export default function ContactPage() {
                         value={formData.email}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        placeholder="john@example.com"
+                        placeholder="Your Email"
                         className={cn(
                           "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
                           "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
@@ -315,54 +328,57 @@ export default function ContactPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                    <div className="space-y-2">
-                      <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">
-                        Phone
-                      </label>
-                      <input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        placeholder="+94 77 123 4567"
-                        className={cn(
-                          "w-full px-4 py-3 md:py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
-                          "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                          "text-sm md:text-base"
-                        )}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="subject" className="block text-sm font-semibold text-gray-700">
-                        Subject
-                      </label>
-                      <select
-                        id="subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className={cn(
-                          "w-full px-4 py-3 md:py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-900",
-                          "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                          "text-sm md:text-base appearance-none cursor-pointer"
-                        )}
-                      >
-                        {subjectOptions.map((opt) => (
-                          <option key={opt.value || "empty"} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                  <div className="space-y-2">
+                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">
+                      Phone Number <span className="text-brand-orange">*</span>
+                    </label>
+                    <input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      placeholder="+94771234567"
+                      className={cn(
+                        "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                        "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                        "text-sm md:text-base",
+                        touched.phone && errors.phone ? "border-red-400" : "border-gray-200"
+                      )}
+                    />
+                    {touched.phone && errors.phone && (
+                      <p className="text-sm text-red-500">{errors.phone}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="subject" className="block text-sm font-semibold text-gray-700">
+                      Subject <span className="text-brand-orange">*</span>
+                    </label>
+                    <input
+                      id="subject"
+                      name="subject"
+                      type="text"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      placeholder="Subject"
+                      className={cn(
+                        "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                        "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                        "text-sm md:text-base",
+                        touched.subject && errors.subject ? "border-red-400" : "border-gray-200"
+                      )}
+                    />
+                    {touched.subject && errors.subject && (
+                      <p className="text-sm text-red-500">{errors.subject}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <label htmlFor="message" className="block text-sm font-semibold text-gray-700">
-                      Message <span className="text-brand-orange">*</span>
+                      Your Message <span className="text-brand-orange">*</span>
                     </label>
                     <textarea
                       id="message"
@@ -370,7 +386,7 @@ export default function ContactPage() {
                       value={formData.message}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      placeholder="Tell us about your travel plans, questions, or how we can help..."
+                      placeholder="Your Message"
                       rows={5}
                       className={cn(
                         "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400 resize-y min-h-[120px]",
@@ -386,7 +402,7 @@ export default function ContactPage() {
 
                   {submitStatus === "error" && (
                     <p className="text-sm text-red-500 bg-red-50 p-3 rounded-xl">
-                      Something went wrong. Please try again or email us directly.
+                      {submitError}
                     </p>
                   )}
 
