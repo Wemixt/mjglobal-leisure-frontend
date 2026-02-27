@@ -9,7 +9,11 @@ export const endpoints = {
   // Tours
   tours: {
     list: `${BASE}/tours`,
-    bySlug: (slug: string) => `${BASE}/tours/${slug}`,
+    /** Tour package detail by slug: GET api/v1/tour-packages/:slug */
+    bySlug: (slug: string) => `api/v1/tour-packages/${slug}`,
+    /** Paginated summary list: GET api/v1/tour-packages/package/summary?page=1 */
+    summaryList: (page: number) =>
+      `api/v1/tour-packages/package/summary?page=${page}`,
   },
 
   // Destinations
@@ -32,13 +36,22 @@ export const endpoints = {
     publishedBySlug: (slug: string) => `api/v1/blogs/published/${slug}`,
   },
 
-  // Contact form submission (NestJS: POST api/v1/contact/message)
+  // Contact
   contact: {
+    /** Form submission: POST api/v1/contact/message */
     submit: `api/v1/contact/message`,
+    /** Newsletter subscribe: POST api/v1/contact/subscribe */
+    subscribe: `api/v1/contact/subscribe`,
   },
 
-  // Testimonials (if needed)
-  testimonials: {
-    list: `${BASE}/testimonials`,
+  // Bookings
+  bookings: {
+    /** Create booking: POST api/v1/bookings */
+    create: `api/v1/bookings`,
+  },
+
+  // Reviews (testimonials): GET api/v1/reviews?page=1, limit 3
+  reviews: {
+    list: (page: number) => `api/v1/reviews?page=${page}`,
   },
 } as const;

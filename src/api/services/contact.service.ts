@@ -15,8 +15,27 @@ export interface ContactResponse {
   message?: string;
 }
 
+/** API body for subscribe */
+export interface SubscribePayload {
+  email: string;
+}
+
+/** API response for subscribe (success / already subscribed) */
+export interface SubscribeResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: unknown;
+  timestamp?: string;
+  path?: string;
+}
+
 export const contactService = {
   submit(payload: ContactPayload): Promise<ContactResponse> {
     return apiPost<ContactResponse>(endpoints.contact.submit, payload);
+  },
+
+  subscribe(payload: SubscribePayload): Promise<SubscribeResponse> {
+    return apiPost<SubscribeResponse>(endpoints.contact.subscribe, payload);
   },
 };

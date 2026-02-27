@@ -43,3 +43,90 @@ export interface Tour {
     /** Day-by-day itinerary for Tour Plan section (optional) */
     itinerary?: TourItineraryDay[];
 }
+
+/** API: tour package detail day item */
+export interface TourDetailDay {
+    id: number;
+    dayNumber: number;
+    location: string;
+    topic: string;
+    subTopic: string;
+    image: string;
+    description: string;
+    mealPlan: string | null;
+    accommodation: boolean;
+    hotelName: string;
+    hotelLocation: string;
+    roomType: string;
+    destinations: string[];
+    thingsToDo: string[];
+}
+
+/** API: tour package detail (GET api/v1/tour-packages/:slug) */
+export interface TourDetail {
+    id: number;
+    name: string;
+    slug: string;
+    heroImage: string;
+    shortDescription: string;
+    description: string;
+    price: number;
+    packageType: string;
+    minPeople: number;
+    totalDays: number;
+    packageDuration: string;
+    tourRefNumber: string;
+    extraDetails: string;
+    includes: string[];
+    excludes: string[];
+    tags: string[];
+    status: string;
+    days: TourDetailDay[];
+}
+
+/** API: full wrapper for tour package detail */
+export interface TourDetailResponse {
+    success: boolean;
+    statusCode: number;
+    message: string;
+    data: TourDetail;
+    timestamp: string;
+    path: string;
+}
+
+/** API: tour package summary list item (list endpoint) */
+export interface TourSummaryItem {
+    id: number;
+    name: string;
+    slug: string;
+    heroImage: string;
+    shortDescription: string;
+    totalDays: number;
+    price: number;
+}
+
+/** API: pagination meta for tour package summary list */
+export interface TourSummaryMeta {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+}
+
+/** API: tour package summary list response (data only) */
+export interface TourSummaryListData {
+    items: TourSummaryItem[];
+    meta: TourSummaryMeta;
+}
+
+/** API: full wrapper for tour package summary list */
+export interface TourSummaryListResponse {
+    success: boolean;
+    statusCode: number;
+    message: string;
+    data: TourSummaryListData;
+    timestamp: string;
+    path: string;
+}

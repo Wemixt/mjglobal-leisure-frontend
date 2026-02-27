@@ -6,3 +6,4 @@ export {
   type ContactPayload,
   type ContactResponse,
 } from "./contact.service";
+export { reviewsService } from "./reviews.service";

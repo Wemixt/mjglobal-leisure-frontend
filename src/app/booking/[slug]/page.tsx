@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { notFound, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
-import { getTourBySlug } from "@/data/tours";
+import { useTourBySlug } from "@/hooks";
+import { bookingsService } from "@/api/services/bookings.service";
 import { ArrowLeft, Clock, Calendar, Users, User, Phone, Mail, Globe, MessageCircle, CheckCircle2, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -47,26 +48,22 @@ const countries = [
 
 export default function BookingPage() {
     const params = useParams();
-    const slug = params.slug as string;
-    const tour = getTourBySlug(slug);
+    const slug = params.slug as string | undefined;
+    const { data: tour, error, isLoading } = useTourBySlug(slug ?? null);
 
     const [formData, setFormData] = useState({
         arrivalDate: "",
         passengers: "",
-        title: "Mr.",
-        fullName: "",
-        phone: "",
+        name: "",
+        phoneNumber: "",
+        whatsapp: "",
         email: "",
         country: "",
-        message: "",
+        clientMessage: "",
     });
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
-
-    if (!tour) {
-        notFound();
-    }
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -84,12 +81,19 @@ export default function BookingPage() {
         const errors: Record<string, string> = {};
         if (!formData.arrivalDate) errors.arrivalDate = "Arrival date is required";
         if (!formData.passengers) errors.passengers = "Total no of pax is required";
-        if (!formData.fullName.trim()) errors.fullName = "Full name is required";
-        if (!formData.phone.trim()) errors.phone = "Contact number is required";
+        if (!formData.name.trim()) errors.name = "Name is required";
+        if (!formData.phoneNumber.trim()) errors.phoneNumber = "Phone number is required";
+        else if (!/^\+\d{6,15}$/.test(formData.phoneNumber)) {
+            errors.phoneNumber = "Enter phone with country code, e.g. +1234567890";
+        }
+        if (!formData.whatsapp.trim()) errors.whatsapp = "WhatsApp number is required";
+        else if (!/^\+\d{6,15}$/.test(formData.whatsapp)) {
+            errors.whatsapp = "Enter WhatsApp with country code, e.g. +1234567890";
+        }
         if (!formData.email.trim()) errors.email = "Email is required";
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Enter a valid email";
         if (!formData.country) errors.country = "Country is required";
-        if (!formData.message.trim()) errors.message = "Message is required";
+        if (!formData.clientMessage.trim()) errors.clientMessage = "Message is required";
         return errors;
     };
 
@@ -101,30 +105,40 @@ export default function BookingPage() {
         setTouched({
             arrivalDate: true,
             passengers: true,
-            fullName: true,
-            phone: true,
+            name: true,
+            phoneNumber: true,
+            whatsapp: true,
             email: true,
             country: true,
-            message: true,
+            clientMessage: true,
         });
-        if (!isValid) return;
+        if (!isValid || !tour) return;
 
         setIsSubmitting(true);
         setSubmitStatus("idle");
 
         try {
-            // Simulate API call – replace with your backend/API route
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+            await bookingsService.create({
+                tourPackageId: tour.id,
+                name: formData.name.trim(),
+                email: formData.email.trim(),
+                phoneNumber: formData.phoneNumber.trim(),
+                country: formData.country,
+                whatsapp: formData.whatsapp.trim(),
+                arrivalDate: new Date(formData.arrivalDate).toISOString(),
+                passengers: Number(formData.passengers),
+                clientMessage: formData.clientMessage.trim(),
+            });
             setSubmitStatus("success");
             setFormData({
                 arrivalDate: "",
                 passengers: "",
-                title: "Mr.",
-                fullName: "",
-                phone: "",
+                name: "",
+                phoneNumber: "",
+                whatsapp: "",
                 email: "",
                 country: "",
-                message: "",
+                clientMessage: "",
             });
             setTouched({});
         } catch {
@@ -141,18 +155,22 @@ export default function BookingPage() {
             <main className="relative z-10">
                 {/* Hero Section */}
                 <section className="relative w-full h-[40vh] md:h-[45vh] lg:h-[50vh] overflow-hidden">
-                    <Image
-                        src={tour.image}
-                        alt={tour.title}
-                        fill
-                        className="object-cover"
-                        priority
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+                    {tour && (
+                        <>
+                            <Image
+                                src={tour.heroImage}
+                                alt={tour.name}
+                                fill
+                                className="object-cover"
+                                priority
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+                        </>
+                    )}
 
                     <div className="absolute top-4 md:top-6 left-3 sm:left-4 md:left-6 z-20">
                         <Link
-                            href={`/tours/${slug}`}
+                            href={slug ? `/tours/${slug}` : "/tours"}
                             className="flex items-center gap-1.5 md:gap-2 bg-white/90 backdrop-blur-sm px-2.5 py-1.5 sm:px-3 sm:py-2 md:px-4 md:py-3 rounded-full shadow-lg hover:bg-white transition-all group"
                         >
                             <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-gray-800 group-hover:-translate-x-1 transition-transform" />
@@ -164,7 +182,7 @@ export default function BookingPage() {
                         <div className="container mx-auto max-w-6xl">
                             <div className="max-w-3xl">
                                 <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight mb-2">
-                                    Book: {tour.title}
+                                    {tour ? `Book: ${tour.name}` : "Book this package"}
                                 </h1>
                                 <p className="text-white/90 text-xs sm:text-sm md:text-base max-w-2xl">
                                     Complete your booking by filling out the form below
@@ -184,39 +202,51 @@ export default function BookingPage() {
                                     <div className="bg-white rounded-xl md:rounded-2xl p-4 sm:p-4 md:p-5 lg:p-6 shadow-md border border-gray-100">
                                         <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-gray-900 mb-4 md:mb-5">Tour Summary</h3>
                                         
-                                        <div className="relative w-full h-48 sm:h-56 md:h-64 rounded-lg overflow-hidden mb-4">
-                                            <Image
-                                                src={tour.image}
-                                                alt={tour.title}
-                                                fill
-                                                className="object-cover"
-                                            />
-                                        </div>
+                                        {tour ? (
+                                            <>
+                                                <div className="relative w-full h-48 sm:h-56 md:h-64 rounded-lg overflow-hidden mb-4">
+                                                    <Image
+                                                        src={tour.heroImage}
+                                                        alt={tour.name}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                </div>
 
-                                        <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-3">{tour.title}</h4>
+                                                <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-3">{tour.name}</h4>
 
-                                        <div className="space-y-3 md:space-y-4">
-                                            <div className="flex items-start gap-2.5 md:gap-3">
-                                                <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-brand-orange/10 flex items-center justify-center">
-                                                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-brand-orange" />
-                                                </div>
-                                                <div>
-                                                    <h5 className="text-xs md:text-sm font-semibold text-gray-900 mb-0.5">Duration</h5>
-                                                    <p className="text-gray-500 text-xs md:text-sm">{tour.duration}</p>
-                                                </div>
-                                            </div>
-                                            {tour.bestTime && (
-                                                <div className="flex items-start gap-2.5 md:gap-3">
-                                                    <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-brand-blue/10 flex items-center justify-center">
-                                                        <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-brand-blue" />
+                                                <div className="space-y-3 md:space-y-4">
+                                                    <div className="flex items-start gap-2.5 md:gap-3">
+                                                        <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-brand-orange/10 flex items-center justify-center">
+                                                            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-brand-orange" />
+                                                        </div>
+                                                        <div>
+                                                            <h5 className="text-xs md:text-sm font-semibold text-gray-900 mb-0.5">Duration</h5>
+                                                            <p className="text-gray-500 text-xs md:text-sm">
+                                                                {tour.packageDuration || `${tour.totalDays} Days`}
+                                                            </p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <h5 className="text-xs md:text-sm font-semibold text-gray-900 mb-0.5">Best time</h5>
-                                                        <p className="text-gray-500 text-xs md:text-sm">{tour.bestTime}</p>
+                                                    <div className="flex items-start gap-2.5 md:gap-3">
+                                                        <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-brand-blue/10 flex items-center justify-center">
+                                                            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-brand-blue" />
+                                                        </div>
+                                                        <div>
+                                                            <h5 className="text-xs md:text-sm font-semibold text-gray-900 mb-0.5">Package type</h5>
+                                                            <p className="text-gray-500 text-xs md:text-sm">{tour.packageType}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-xs md:text-sm text-gray-600">
+                                                        <span className="font-semibold text-gray-900">From ${tour.price}</span>
+                                                        {tour.minPeople ? ` · Min ${tour.minPeople} people` : null}
                                                     </div>
                                                 </div>
-                                            )}
-                                        </div>
+                                            </>
+                                        ) : (
+                                            <p className="text-sm text-gray-500">
+                                                {isLoading ? "Loading tour details..." : error || "Tour details not available."}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -323,80 +353,84 @@ export default function BookingPage() {
 
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                                                     <div className="space-y-2">
-                                                        <label htmlFor="fullName" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                        <label htmlFor="name" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                                                             <User className="w-4 h-4 text-gray-500" />
-                                                            Enter Full Name <span className="text-brand-orange">*</span>
-                                                        </label>
-                                                        <div className="flex gap-2">
-                                                            <select
-                                                                name="title"
-                                                                value={formData.title}
-                                                                onChange={handleChange}
-                                                                onBlur={handleBlur}
-                                                                className={cn(
-                                                                    "w-20 flex-shrink-0 px-3 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900",
-                                                                    "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                                                                    "text-sm md:text-base appearance-none cursor-pointer",
-                                                                    "border-gray-200"
-                                                                )}
-                                                            >
-                                                                <option value="Mr.">Mr.</option>
-                                                                <option value="Mrs.">Mrs.</option>
-                                                                <option value="Ms.">Ms.</option>
-                                                                <option value="Miss">Miss</option>
-                                                                <option value="Dr.">Dr.</option>
-                                                            </select>
-                                                            <input
-                                                                id="fullName"
-                                                                name="fullName"
-                                                                type="text"
-                                                                value={formData.fullName}
-                                                                onChange={handleChange}
-                                                                onBlur={handleBlur}
-                                                                placeholder="Name"
-                                                                className={cn(
-                                                                    "flex-1 min-w-0 px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
-                                                                    "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                                                                    "text-sm md:text-base",
-                                                                    touched.fullName && errors.fullName ? "border-red-400" : "border-gray-200"
-                                                                )}
-                                                            />
-                                                        </div>
-                                                        {touched.fullName && errors.fullName && (
-                                                            <p className="text-sm text-red-500">{errors.fullName}</p>
-                                                        )}
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label htmlFor="phone" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                                                            <Phone className="w-4 h-4 text-gray-500" />
-                                                            Your Contact No. <span className="text-brand-orange">*</span>
+                                                            Name <span className="text-brand-orange">*</span>
                                                         </label>
                                                         <input
-                                                            id="phone"
-                                                            name="phone"
-                                                            type="tel"
-                                                            value={formData.phone}
+                                                            id="name"
+                                                            name="name"
+                                                            type="text"
+                                                            value={formData.name}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
-                                                            placeholder="+94771234567"
+                                                            placeholder="Full name"
                                                             className={cn(
                                                                 "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
                                                                 "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
                                                                 "text-sm md:text-base",
-                                                                touched.phone && errors.phone ? "border-red-400" : "border-gray-200"
+                                                                touched.name && errors.name ? "border-red-400" : "border-gray-200"
                                                             )}
                                                         />
-                                                        {touched.phone && errors.phone && (
-                                                            <p className="text-sm text-red-500">{errors.phone}</p>
+                                                        {touched.name && errors.name && (
+                                                            <p className="text-sm text-red-500">{errors.name}</p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="phoneNumber" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Phone className="w-4 h-4 text-gray-500" />
+                                                            Phone Number (with country code) <span className="text-brand-orange">*</span>
+                                                        </label>
+                                                        <input
+                                                            id="phoneNumber"
+                                                            name="phoneNumber"
+                                                            type="tel"
+                                                            value={formData.phoneNumber}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            placeholder="+1234567890"
+                                                            className={cn(
+                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                                                                "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                                                                "text-sm md:text-base",
+                                                                touched.phoneNumber && errors.phoneNumber ? "border-red-400" : "border-gray-200"
+                                                            )}
+                                                        />
+                                                        {touched.phoneNumber && errors.phoneNumber && (
+                                                            <p className="text-sm text-red-500">{errors.phoneNumber}</p>
                                                         )}
                                                     </div>
                                                 </div>
 
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                                                     <div className="space-y-2">
+                                                        <label htmlFor="whatsapp" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <Phone className="w-4 h-4 text-gray-500" />
+                                                            WhatsApp (with country code) <span className="text-brand-orange">*</span>
+                                                        </label>
+                                                        <input
+                                                            id="whatsapp"
+                                                            name="whatsapp"
+                                                            type="tel"
+                                                            value={formData.whatsapp}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            placeholder="+1234567890"
+                                                            className={cn(
+                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400",
+                                                                "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                                                                "text-sm md:text-base",
+                                                                touched.whatsapp && errors.whatsapp ? "border-red-400" : "border-gray-200"
+                                                            )}
+                                                        />
+                                                        {touched.whatsapp && errors.whatsapp && (
+                                                            <p className="text-sm text-red-500">{errors.whatsapp}</p>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-2">
                                                         <label htmlFor="email" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                                                             <Mail className="w-4 h-4 text-gray-500" />
-                                                            Your Email Address <span className="text-brand-orange">*</span>
+                                                            Email Address <span className="text-brand-orange">*</span>
                                                         </label>
                                                         <input
                                                             id="email"
@@ -417,10 +451,13 @@ export default function BookingPage() {
                                                             <p className="text-sm text-red-500">{errors.email}</p>
                                                         )}
                                                     </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                                                     <div className="space-y-2">
                                                         <label htmlFor="country" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                                                             <Globe className="w-4 h-4 text-gray-500" />
-                                                            Your Country <span className="text-brand-orange">*</span>
+                                                            Country <span className="text-brand-orange">*</span>
                                                         </label>
                                                         <select
                                                             id="country"
@@ -445,31 +482,30 @@ export default function BookingPage() {
                                                             <p className="text-sm text-red-500">{errors.country}</p>
                                                         )}
                                                     </div>
-                                                </div>
-
-                                                <div className="space-y-2">
-                                                    <label htmlFor="message" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-                                                        <MessageCircle className="w-4 h-4 text-gray-500" />
-                                                        Enter your message <span className="text-brand-orange">*</span>
-                                                    </label>
-                                                    <textarea
-                                                        id="message"
-                                                        name="message"
-                                                        value={formData.message}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        placeholder="Enter your message"
-                                                        rows={4}
-                                                        className={cn(
-                                                            "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400 resize-y min-h-[100px]",
-                                                            "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
-                                                            "text-sm md:text-base",
-                                                            touched.message && errors.message ? "border-red-400" : "border-gray-200"
+                                                    <div className="space-y-2">
+                                                        <label htmlFor="clientMessage" className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                                            <MessageCircle className="w-4 h-4 text-gray-500" />
+                                                            Message <span className="text-brand-orange">*</span>
+                                                        </label>
+                                                        <textarea
+                                                            id="clientMessage"
+                                                            name="clientMessage"
+                                                            value={formData.clientMessage}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            placeholder="Enter your message"
+                                                            rows={4}
+                                                            className={cn(
+                                                                "w-full px-4 py-3 md:py-3.5 rounded-xl border bg-gray-50/50 text-gray-900 placeholder:text-gray-400 resize-y min-h-[100px]",
+                                                                "focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all",
+                                                                "text-sm md:text-base",
+                                                                touched.clientMessage && errors.clientMessage ? "border-red-400" : "border-gray-200"
+                                                            )}
+                                                        />
+                                                        {touched.clientMessage && errors.clientMessage && (
+                                                            <p className="text-sm text-red-500">{errors.clientMessage}</p>
                                                         )}
-                                                    />
-                                                    {touched.message && errors.message && (
-                                                        <p className="text-sm text-red-500">{errors.message}</p>
-                                                    )}
+                                                    </div>
                                                 </div>
 
                                                 {submitStatus === "error" && (

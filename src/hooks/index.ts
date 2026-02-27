@@ -1,5 +1,5 @@
 export { useApi, type UseApiState } from "./useApi";
-export { useTours } from "./useTours";
+export { useTours, useTourSummaryList } from "./useTours";
 export { useTourBySlug } from "./useTourBySlug";
 export { useDestinations, useDestinationSummaryList } from "./useDestinations";
 export { useDestinationBySlug } from "./useDestinationBySlug";
@@ -8,3 +8,4 @@ export {
   useContactSubmit,
   type UseContactSubmitState,
 } from "./useContactSubmit";
+export { useReviewsList } from "./useReviews";

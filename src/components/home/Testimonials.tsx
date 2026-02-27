@@ -1,171 +1,19 @@
 "use client";
 
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Star, Quote, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
-
-interface Testimonial {
-  id: number;
-  name: string;
-  role: string;
-  location: string;
-  rating: number;
-  comment: string;
-  avatar?: string;
-}
-
-const testimonials: Testimonial[] = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    role: "Travel Enthusiast",
-    location: "United States",
-    rating: 5,
-    comment: "An absolutely incredible experience! The team at MJ Global Leisure made our Sri Lankan adventure unforgettable. From the pristine beaches to the wildlife safaris, every moment was perfectly planned. Highly recommend!",
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    role: "Photographer",
-    location: "Singapore",
-    rating: 5,
-    comment: "As a photographer, I was blown away by the stunning locations they took us to. The Nine Arch Bridge and lighthouse views were breathtaking. The guides were knowledgeable and patient with our photo stops.",
-  },
-  {
-    id: 3,
-    name: "Emma Williams",
-    role: "Adventure Seeker",
-    location: "Australia",
-    rating: 5,
-    comment: "The diving and snorkeling experiences were world-class! Crystal clear waters and amazing marine life. The team ensured our safety while maximizing the fun. Can't wait to come back for more adventures!",
-  },
-  {
-    id: 4,
-    name: "David Kumar",
-    role: "Family Traveler",
-    location: "India",
-    rating: 5,
-    comment: "Traveled with my family including two young kids. MJ Global Leisure made everything so easy and enjoyable. The kids loved the elephant encounters and camping experiences. Truly a memorable family vacation!",
-  },
-  {
-    id: 5,
-    name: "Lisa Anderson",
-    role: "Wellness Enthusiast",
-    location: "United Kingdom",
-    rating: 5,
-    comment: "The herbal treatment and spa experiences were rejuvenating. Combined with the beautiful natural settings, it was the perfect wellness retreat. The team's attention to detail and hospitality was exceptional.",
-  },
-  {
-    id: 6,
-    name: "James Wilson",
-    role: "Solo Traveler",
-    location: "Canada",
-    rating: 5,
-    comment: "As a solo traveler, I was initially hesitant, but MJ Global Leisure made me feel safe and included. The group tours were well-organized and I met amazing people. The whale watching was a highlight!",
-  },
-  {
-    id: 7,
-    name: "Maria Garcia",
-    role: "Nature Lover",
-    location: "Spain",
-    rating: 5,
-    comment: "The wildlife safaris exceeded all expectations! We saw elephants, leopards, and so many birds. The guides were incredibly knowledgeable about the local wildlife and conservation efforts. A truly educational and exciting experience!",
-  },
-  {
-    id: 8,
-    name: "Robert Thompson",
-    role: "Beach Enthusiast",
-    location: "New Zealand",
-    rating: 5,
-    comment: "The beaches in Sri Lanka are absolutely stunning! MJ Global Leisure took us to hidden gems we never would have found on our own. The surfing lessons were professional and the beachside accommodations were perfect.",
-  },
-  {
-    id: 9,
-    name: "Sophie Martin",
-    role: "Cultural Explorer",
-    location: "France",
-    rating: 5,
-    comment: "The cultural tours were fascinating! We visited ancient temples, learned about local traditions, and enjoyed authentic Sri Lankan cuisine. The team's cultural insights made every site visit meaningful and memorable.",
-  },
-  {
-    id: 10,
-    name: "Ahmed Hassan",
-    role: "Honeymooner",
-    location: "UAE",
-    rating: 5,
-    comment: "Perfect honeymoon destination! MJ Global Leisure arranged everything beautifully - from romantic beach dinners to private tours. The attention to detail and personalized service made our special trip absolutely unforgettable.",
-  },
-];
+import { useReviewsList } from "@/hooks";
+import type { ReviewItem } from "@/types";
 
 export default function Testimonials() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [activeReview, setActiveReview] = useState<ReviewItem | null>(null);
+  const { data, error, isLoading } = useReviewsList(currentPage);
 
-  // Calculate how many testimonials to show based on screen size
-  const getVisibleCount = () => {
-    if (typeof window === 'undefined') return 3;
-    if (window.innerWidth < 768) return 1;
-    if (window.innerWidth < 1024) return 2;
-    return 3;
-  };
-
-  const [visibleCount, setVisibleCount] = useState(3);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setVisibleCount(getVisibleCount());
-    };
-    
-    setVisibleCount(getVisibleCount());
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Get visible testimonials
-  const getVisibleTestimonials = () => {
-    const visible: Testimonial[] = [];
-    for (let i = 0; i < visibleCount; i++) {
-      const index = (currentIndex + i) % testimonials.length;
-      visible.push(testimonials[index]);
-    }
-    return visible;
-  };
-
-  // Auto-rotate testimonials
-  useEffect(() => {
-    if (!isAutoPlaying) return;
-
-    const interval = setInterval(() => {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentIndex((prev) => (prev + visibleCount) % testimonials.length);
-        setIsTransitioning(false);
-      }, 300);
-    }, 5000); // Change every 5 seconds
-
-    return () => clearInterval(interval);
-  }, [isAutoPlaying, visibleCount]);
-
-  const goToPrevious = () => {
-    setIsAutoPlaying(false);
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev - visibleCount + testimonials.length) % testimonials.length);
-      setIsTransitioning(false);
-    }, 300);
-    setTimeout(() => setIsAutoPlaying(true), 8000);
-  };
-
-  const goToNext = () => {
-    setIsAutoPlaying(false);
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev + visibleCount) % testimonials.length);
-      setIsTransitioning(false);
-    }, 300);
-    setTimeout(() => setIsAutoPlaying(true), 8000);
-  };
+  const items = data?.items ?? [];
+  const meta = data?.meta;
+  const totalPages = meta?.totalPages ?? 1;
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }).map((_, index) => (
@@ -181,18 +29,19 @@ export default function Testimonials() {
     ));
   };
 
-  const visibleTestimonials = getVisibleTestimonials();
+  const isCommentLong = (comment: string) => comment.length > 220;
 
   return (
     <section className="relative w-full py-16 md:py-24 lg:py-32 bg-[#FAF9F6] overflow-hidden">
-      {/* Background Decorative Elements */}
       <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-brand-orange/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-blue/5 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2" />
 
       <div className="container mx-auto px-6 md:px-12 lg:px-16 xl:px-20 relative z-10">
-        {/* Header Section */}
         <div className="text-center mb-12 md:mb-16 space-y-2">
-          <p className="text-brand-orange text-sm md:text-base lg:text-lg italic tracking-wide" style={{ fontFamily: 'cursive' }}>
+          <p
+            className="text-brand-orange text-sm md:text-base lg:text-lg italic tracking-wide"
+            style={{ fontFamily: "cursive" }}
+          >
             What Our Clients Say
           </p>
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-black tracking-tight">
@@ -203,94 +52,239 @@ export default function Testimonials() {
           </p>
         </div>
 
-        {/* Testimonials Grid - Always shows 3 (or responsive: 1 on mobile, 2 on tablet) */}
         <div className="relative max-w-7xl mx-auto">
-          {/* Navigation Arrows */}
-          <button
-            onClick={goToPrevious}
-            className={cn(
-              "absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 lg:-translate-x-8 z-20",
-              "w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg",
-              "flex items-center justify-center text-brand-orange",
-              "hover:bg-brand-orange hover:text-white transition-all duration-300",
-              "hover:scale-110 active:scale-95"
-            )}
-            aria-label="Previous testimonials"
-          >
-            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
-          </button>
+          {error && (
+            <div className="text-center py-12 text-red-600 bg-red-50 rounded-2xl">
+              {error}
+            </div>
+          )}
 
-          {/* Testimonials Grid */}
-          <div
-            className={cn(
-              "grid gap-4 md:gap-6 lg:gap-8",
-              "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-              "transition-all duration-500 ease-in-out",
-              isTransitioning ? "opacity-50" : "opacity-100"
-            )}
-          >
-            {visibleTestimonials.map((testimonial, index) => (
-              <div
-                key={`${testimonial.id}-${currentIndex}`}
+          {isLoading && (
+            <div
+              className={cn(
+                "grid gap-4 md:gap-6 lg:gap-8",
+                "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              )}
+            >
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-2xl md:rounded-3xl shadow-lg p-6 md:p-7 lg:p-8 h-[240px] animate-pulse"
+                />
+              ))}
+            </div>
+          )}
+
+          {!isLoading && !error && items.length === 0 && (
+            <div className="text-center py-12 text-gray-500 rounded-2xl bg-white/80">
+              No reviews yet.
+            </div>
+          )}
+
+          {!isLoading && !error && items.length > 0 && (
+            <>
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={!meta?.hasPreviousPage}
                 className={cn(
-                  "relative bg-white rounded-2xl md:rounded-3xl shadow-lg hover:shadow-xl",
-                  "p-6 md:p-7 lg:p-8",
-                  "transition-all duration-300",
-                  "transform hover:-translate-y-1"
+                  "absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 lg:-translate-x-8 z-20",
+                  "w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg",
+                  "flex items-center justify-center",
+                  meta?.hasPreviousPage
+                    ? "text-brand-orange hover:bg-brand-orange hover:text-white transition-all duration-300 hover:scale-110 active:scale-95"
+                    : "text-gray-300 cursor-not-allowed"
+                )}
+                aria-label="Previous reviews"
+              >
+                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+              </button>
+
+              <div
+                className={cn(
+                  "grid gap-4 md:gap-6 lg:gap-8",
+                  "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
                 )}
               >
-                {/* Quote Icon */}
-                <div className="absolute top-4 right-4 md:top-5 md:right-5 w-10 h-10 md:w-11 md:h-11 bg-brand-orange/10 rounded-full flex items-center justify-center">
-                  <Quote className="w-4 h-4 md:w-5 md:h-5 text-brand-orange" />
-                </div>
+                {items.map((review) => {
+                  const isLong = isCommentLong(review.comment);
 
-                {/* Rating Stars */}
-                <div className="flex items-center gap-1 mb-4">
-                  {renderStars(testimonial.rating)}
-                </div>
+                  return (
+                    <div
+                      key={review.id}
+                      className={cn(
+                        "relative bg-white rounded-2xl md:rounded-3xl shadow-lg hover:shadow-xl",
+                        "p-6 md:p-7 lg:p-8",
+                        "transition-all duration-300",
+                        "transform hover:-translate-y-1",
+                        "flex flex-col"
+                      )}
+                    >
+                      <div className="absolute top-4 right-4 md:top-5 md:right-5 w-10 h-10 md:w-11 md:h-11 bg-brand-orange/10 rounded-full flex items-center justify-center">
+                        <Quote className="w-4 h-4 md:w-5 md:h-5 text-brand-orange" />
+                      </div>
 
-                {/* Testimonial Comment */}
-                <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-6 pr-6 md:pr-8">
-                  "{testimonial.comment}"
-                </p>
+                      <div className="flex items-center gap-1 mb-4">
+                        {renderStars(review.rating)}
+                      </div>
 
-                {/* Customer Info */}
-                <div className="flex items-center gap-3 md:gap-4">
-                  {/* Avatar */}
-                  <div className="flex-shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-brand-orange to-brand-blue flex items-center justify-center text-white font-bold text-base md:text-lg shadow-lg">
-                    {testimonial.name.charAt(0)}
-                  </div>
+                      {review.title ? (
+                        <h3 className="text-sm md:text-base font-semibold text-gray-900 mb-2 pr-8">
+                          {review.title}
+                        </h3>
+                      ) : null}
 
-                  {/* Name and Details */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base md:text-lg font-bold text-black mb-0.5 truncate">
-                      {testimonial.name}
-                    </h3>
-                    <p className="text-xs md:text-sm text-gray-600 truncate">
-                      {testimonial.role} • {testimonial.location}
-                    </p>
-                  </div>
-                </div>
+                      {/* Comment – always 3 lines here for consistent card height */}
+                      <div className="mb-3 pr-6 md:pr-8">
+                        <p className="text-gray-700 text-sm md:text-base leading-relaxed line-clamp-3">
+                          &quot;{review.comment}&quot;
+                        </p>
+                      </div>
+
+                      {isLong && (
+                        <button
+                          type="button"
+                          onClick={() => setActiveReview(review)}
+                          className="text-xs md:text-sm text-brand-orange font-semibold hover:underline mb-3 self-start"
+                        >
+                          Show more
+                        </button>
+                      )}
+
+                      <div className="mt-auto flex items-center gap-3 md:gap-4">
+                        <div className="flex-shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-brand-orange to-brand-blue flex items-center justify-center text-white font-bold text-base md:text-lg shadow-lg">
+                          {review.name.charAt(0)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base md:text-lg font-bold text-black mb-0.5 truncate">
+                            {review.name}
+                          </h3>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-          </div>
 
-          {/* Right Navigation Arrow */}
-          <button
-            onClick={goToNext}
-            className={cn(
-              "absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 lg:translate-x-8 z-20",
-              "w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg",
-              "flex items-center justify-center text-brand-orange",
-              "hover:bg-brand-orange hover:text-white transition-all duration-300",
-              "hover:scale-110 active:scale-95"
-            )}
-            aria-label="Next testimonials"
-          >
-            <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
-          </button>
+              <button
+                onClick={() => setCurrentPage((p) => p + 1)}
+                disabled={!meta?.hasNextPage}
+                className={cn(
+                  "absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 lg:translate-x-8 z-20",
+                  "w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg",
+                  "flex items-center justify-center",
+                  meta?.hasNextPage
+                    ? "text-brand-orange hover:bg-brand-orange hover:text-white transition-all duration-300 hover:scale-110 active:scale-95"
+                    : "text-gray-300 cursor-not-allowed"
+                )}
+                aria-label="Next reviews"
+              >
+                <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+              </button>
+            </>
+          )}
+
+          {!isLoading && !error && items.length > 0 && meta && totalPages > 1 && (
+            <div className="mt-8 flex flex-col items-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={!meta.hasPreviousPage}
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
+                  meta.hasPreviousPage
+                    ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                    : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                )}
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Prev
+              </button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    type="button"
+                    onClick={() => setCurrentPage(page)}
+                    className={cn(
+                      "min-w-[2.25rem] rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
+                      currentPage === page
+                        ? "border-brand-orange bg-brand-orange text-white"
+                        : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                    )}
+                    aria-label={`Page ${page}`}
+                    aria-current={currentPage === page ? "page" : undefined}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setCurrentPage((p) => p + 1)}
+                disabled={!meta.hasNextPage}
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
+                  meta.hasNextPage
+                    ? "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                    : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                )}
+                aria-label="Next page"
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </button>
+              </div>
+              <p className="text-xs text-gray-500">
+                Page {meta.page} of {totalPages}
+                {meta.total != null && ` · ${meta.total} review${meta.total !== 1 ? "s" : ""} total`}
+              </p>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Full review modal */}
+      {activeReview && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
+          <div className="relative w-full max-w-lg bg-white rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-8">
+            <button
+              type="button"
+              onClick={() => setActiveReview(null)}
+              className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+              aria-label="Close full review"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2 mb-3">
+              {renderStars(activeReview.rating)}
+            </div>
+
+            {activeReview.title && (
+              <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
+                {activeReview.title}
+              </h3>
+            )}
+
+            <p className="text-gray-700 text-sm md:text-base leading-relaxed mb-4">
+              &quot;{activeReview.comment}&quot;
+            </p>
+
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-brand-orange to-brand-blue flex items-center justify-center text-white font-bold text-sm md:text-base shadow-lg">
+                {activeReview.name.charAt(0)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm md:text-base font-semibold text-gray-900 truncate">
+                  {activeReview.name}
+                </h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
