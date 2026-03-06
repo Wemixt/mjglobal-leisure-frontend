@@ -9,3 +9,4 @@ export {
   type UseContactSubmitState,
 } from "./useContactSubmit";
 export { useReviewsList } from "./useReviews";
+export { useGalleryList } from "./useGallery";

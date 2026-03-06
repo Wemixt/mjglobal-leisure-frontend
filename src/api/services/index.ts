@@ -7,3 +7,4 @@ export {
   type ContactResponse,
 } from "./contact.service";
 export { reviewsService } from "./reviews.service";
+export { galleryService } from "./gallery.service";

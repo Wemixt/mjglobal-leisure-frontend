@@ -54,4 +54,9 @@ export const endpoints = {
   reviews: {
     list: (page: number) => `api/v1/reviews?page=${page}`,
   },
+
+  // Gallery: GET api/v1/gallery/?page=1
+  gallery: {
+    list: (page: number) => `api/v1/gallery/?page=${page}`,
+  },
 } as const;
