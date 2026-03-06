@@ -5,11 +5,47 @@ import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import { destinationsService } from "@/api/services";
 import { ClientError } from "@/api/client";
+import { getDestinationBySlug } from "@/data/destinations";
 import { ArrowLeft, MapPin, Calendar, CheckCircle2 } from "lucide-react";
 import type { DestinationDetail } from "@/types";
 
 interface DestinationDetailsPageProps {
   params: Promise<{ slug: string }>;
+}
+
+/** Map static Destination to API-shaped DestinationDetail for fallback when API 404s. */
+function staticToDetail(d: {
+  id: string;
+  slug: string;
+  name: string;
+  shortDescription: string;
+  description: string;
+  image: string;
+  location: string;
+  highlights: string[];
+  bestTimeToVisit: string;
+}): DestinationDetail {
+  return {
+    id: parseInt(d.id, 10) || 0,
+    title: d.name,
+    slug: d.slug,
+    excerpt: d.shortDescription,
+    content: d.description,
+    coverImage: d.image,
+    images: [],
+    tags: [],
+    location: d.location,
+    specificName: "",
+    bestTime: d.bestTimeToVisit,
+    tourCount: 0,
+    explorerNote: "",
+    keyHighlights: d.highlights.map((title) => ({ title, description: "" })),
+    status: "published",
+    publishedAt: "",
+    views: 0,
+    createdAt: "",
+    updatedAt: "",
+  };
 }
 
 /** Render content as plain text paragraphs (no HTML). */
@@ -29,9 +65,12 @@ export default async function DestinationDetailsPage({ params }: DestinationDeta
     destination = await destinationsService.getPublishedBySlug(slug);
   } catch (e) {
     if (e instanceof ClientError && e.status === 404) {
-      notFound();
+      const staticDest = getDestinationBySlug(slug);
+      if (staticDest) destination = staticToDetail(staticDest);
+      else notFound();
+    } else {
+      throw e;
     }
-    throw e;
   }
 
   const keyHighlights = destination.keyHighlights ?? [];

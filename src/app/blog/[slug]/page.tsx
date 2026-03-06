@@ -5,11 +5,48 @@ import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import { blogService } from "@/api/services";
 import { ClientError } from "@/api/client";
+import { getBlogBySlug } from "@/data/blogs";
 import { ArrowLeft, Calendar, Clock, User, MapPin } from "lucide-react";
 import type { BlogPostDetail } from "@/types";
 
 interface BlogDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+/** Map static BlogPost to API-shaped BlogPostDetail for fallback when API 404s. */
+function staticToDetail(p: {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  image: string;
+  author: string;
+  publishedAt: string;
+  readTime: string;
+  category: string;
+  tags?: string[];
+}): BlogPostDetail {
+  return {
+    id: parseInt(p.id, 10) || 0,
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt,
+    content: p.content,
+    coverImage: p.image,
+    images: [],
+    tags: p.tags ?? [],
+    readingTime: p.readTime,
+    category: p.category,
+    relatedBlogs: [],
+    status: "published",
+    publishedAt: p.publishedAt,
+    views: 0,
+    authorId: "",
+    authorName: p.author,
+    createdAt: "",
+    updatedAt: "",
+  };
 }
 
 function formatBlogContent(content: string) {
@@ -45,9 +82,12 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     post = await blogService.getPublishedBySlug(slug);
   } catch (e) {
     if (e instanceof ClientError && e.status === 404) {
-      notFound();
+      const staticPost = getBlogBySlug(slug);
+      if (staticPost) post = staticToDetail(staticPost);
+      else notFound();
+    } else {
+      throw e;
     }
-    throw e;
   }
 
   return (

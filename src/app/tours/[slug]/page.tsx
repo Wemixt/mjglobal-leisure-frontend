@@ -8,10 +8,79 @@ import DayByDayDetails from "@/components/features/DayByDayDetails";
 import { ArrowLeft, Clock, Calendar } from "lucide-react";
 import { toursService } from "@/api/services";
 import { ClientError } from "@/api/client";
-import type { TourDetail, TourItineraryDay } from "@/types";
+import { getTourBySlug } from "@/data/tours";
+import type { Tour, TourDetail, TourItineraryDay } from "@/types";
 
 interface TourDetailsPageProps {
   params: Promise<{ slug: string }>;
+}
+
+function parseTotalDaysFromTour(tour: Tour): number {
+  if (tour.duration) {
+    const match = tour.duration.match(/\d+/);
+    if (match) {
+      const value = parseInt(match[0], 10);
+      if (!Number.isNaN(value)) return value;
+    }
+  }
+  if (tour.itinerary && tour.itinerary.length > 0) {
+    return tour.itinerary.length;
+  }
+  return 0;
+}
+
+function staticItineraryToDetailDays(
+  itinerary: TourItineraryDay[] | undefined
+): TourDetail["days"] {
+  if (!itinerary || itinerary.length === 0) return [];
+  return itinerary.map((day, index) => ({
+    id: index + 1,
+    dayNumber: day.day,
+    location: day.location ?? "",
+    topic: day.title,
+    subTopic: "",
+    image: day.image ?? "",
+    description:
+      day.dayDescription ??
+      (day.items && day.items.length > 0 ? day.items.join("\n") : ""),
+    mealPlan: null,
+    accommodation: false,
+    hotelName: "",
+    hotelLocation: "",
+    roomType: "",
+    destinations: day.destinations ?? [],
+    thingsToDo: day.thingsToDo ?? [],
+  }));
+}
+
+/** Map static Tour to API-shaped TourDetail for fallback when API 404s. */
+function staticToDetail(tour: Tour): TourDetail {
+  const totalDays = parseTotalDaysFromTour(tour);
+
+  return {
+    id: parseInt(tour.id, 10) || 0,
+    name: tour.title,
+    slug: tour.slug,
+    heroImage: tour.image,
+    shortDescription: tour.shortDescription,
+    description:
+      tour.tourOverview ||
+      tour.packageDescription ||
+      tour.description ||
+      "",
+    price: tour.price ? Number(tour.price) || 0 : 0,
+    packageType: tour.packageType || "",
+    minPeople: tour.minPeople ? Number(tour.minPeople) || 0 : 0,
+    totalDays,
+    packageDuration: tour.duration || `${totalDays || ""} Days`,
+    tourRefNumber: tour.tourRefNo || "",
+    extraDetails: tour.packageDescription || tour.description || "",
+    includes: tour.includes ?? [],
+    excludes: tour.excludes ?? [],
+    tags: [],
+    status: "published",
+    days: staticItineraryToDetailDays(tour.itinerary),
+  };
 }
 
 function mapDaysToItinerary(days: TourDetail["days"]): TourItineraryDay[] {
@@ -36,9 +105,15 @@ export default async function TourDetailsPage({ params }: TourDetailsPageProps) 
     tour = await toursService.getBySlug(slug);
   } catch (e) {
     if (e instanceof ClientError && e.status === 404) {
-      notFound();
+      const staticTour = getTourBySlug(slug);
+      if (staticTour) {
+        tour = staticToDetail(staticTour);
+      } else {
+        notFound();
+      }
+    } else {
+      throw e;
     }
-    throw e;
   }
 
   const itinerary = mapDaysToItinerary(tour.days);

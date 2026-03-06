@@ -14,6 +14,7 @@ const footerLinks = [
             { name: "Home", href: "/" },
             { name: "Destinations", href: "/destinations" },
             { name: "Tour packages", href: "/tours" },
+            { name: "Gallery", href: "/gallery" },
             { name: "Blog", href: "/blog" },
             { name: "About", href: "/about" },
             { name: "Contact", href: "/contact" },
